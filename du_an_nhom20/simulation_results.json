@@ -1,0 +1,528 @@
+{
+  "baseline": {
+    "n_reps": 20,
+    "n_students": 60,
+    "n_tutors": 10,
+    "as_is": {
+      "match_rate_mean": 60.416666666666664,
+      "match_rate_std": 8.706239780244458,
+      "fit_matched_mean": 96.75134115700038,
+      "fit_all_mean": 58.45,
+      "wait_hrs_mean": 22.564672356799527,
+      "wait_days_mean": 2.820584044599941,
+      "p90_hrs_mean": 31.286169641409533,
+      "p90_days_mean": 3.9107712051761916,
+      "sla_16h_mean": 18.0,
+      "rho_mgr_mean": 49.67372728560203,
+      "rho_cskh_mean": 13.681715155230389,
+      "little_L_wip": 5.641168089199882,
+      "stage_cskh_hrs": 1.9492905758563412,
+      "stage_match_hrs": 15.655368017943292,
+      "stage_trial_hrs": 4.960013762999898,
+      "closed_lost_avg": {
+        "SCHEDULE_MISMATCH": 6.25,
+        "CENTER_CANNOT_SERVE": 17.5
+      }
+    },
+    "to_be": {
+      "match_rate_mean": 92.66666666666666,
+      "match_rate_std": 4.358898943540673,
+      "fit_matched_mean": 93.28288525769898,
+      "fit_all_mean": 86.45,
+      "wait_hrs_mean": 10.293664900201238,
+      "wait_days_mean": 1.2867081125251547,
+      "p90_hrs_mean": 13.24258620754975,
+      "p90_days_mean": 1.6553232759437186,
+      "sla_16h_mean": 99.25,
+      "rho_mgr_mean": 8.667187396586176,
+      "rho_cskh_mean": 11.346481701399858,
+      "little_L_wip": 2.5734162250503094,
+      "stage_cskh_hrs": 1.6823525478300076,
+      "stage_match_hrs": 5.0475593141719575,
+      "stage_trial_hrs": 3.563753038199271
+    }
+  },
+  "sensitivity_demand": [
+    [
+      45,
+      {
+        "match_rate_mean": 58.518518518518526,
+        "match_rate_std": 9.785070232313263,
+        "fit_matched_mean": 97.74806985961277,
+        "fit_all_mean": 57.14814814814815,
+        "wait_hrs_mean": 21.822375052591862,
+        "wait_days_mean": 2.727796881573983,
+        "p90_hrs_mean": 29.207692976034995,
+        "p90_days_mean": 3.6509616220043744,
+        "sla_16h_mean": 20.555555555555557,
+        "rho_mgr_mean": 37.19826597577762,
+        "rho_cskh_mean": 10.182325650253214,
+        "little_L_wip": 4.091695322360975,
+        "stage_cskh_hrs": 1.8099598507468677,
+        "stage_match_hrs": 15.048975497271043,
+        "stage_trial_hrs": 4.9634397045739584,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 4.5,
+          "CENTER_CANNOT_SERVE": 14.166666666666666
+        }
+      },
+      {
+        "match_rate_mean": 87.03703703703702,
+        "match_rate_std": 4.611073925181015,
+        "fit_matched_mean": 93.23899654314317,
+        "fit_all_mean": 81.14814814814815,
+        "wait_hrs_mean": 10.228931503268457,
+        "wait_days_mean": 1.2786164379085572,
+        "p90_hrs_mean": 13.31244446143163,
+        "p90_days_mean": 1.6640555576789537,
+        "sla_16h_mean": 97.96296296296298,
+        "rho_mgr_mean": 6.593555265659073,
+        "rho_cskh_mean": 8.576377311990626,
+        "little_L_wip": 1.9179246568628356,
+        "stage_cskh_hrs": 1.6271420484276824,
+        "stage_match_hrs": 5.025774386296352,
+        "stage_trial_hrs": 3.576015068544422
+      }
+    ],
+    [
+      60,
+      {
+        "match_rate_mean": 64.58333333333333,
+        "match_rate_std": 5.897464929322816,
+        "fit_matched_mean": 96.80253502076135,
+        "fit_all_mean": 62.50000000000001,
+        "wait_hrs_mean": 22.068290101589813,
+        "wait_days_mean": 2.7585362626987266,
+        "p90_hrs_mean": 30.66931593766947,
+        "p90_days_mean": 3.8336644922086838,
+        "sla_16h_mean": 19.722222222222225,
+        "rho_mgr_mean": 48.02350168797445,
+        "rho_cskh_mean": 13.250619036738536,
+        "little_L_wip": 5.517072525397453,
+        "stage_cskh_hrs": 1.8834646722984327,
+        "stage_match_hrs": 14.975637399130461,
+        "stage_trial_hrs": 5.209188030160918,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 5.75,
+          "CENTER_CANNOT_SERVE": 15.5
+        }
+      },
+      {
+        "match_rate_mean": 92.5,
+        "match_rate_std": 3.7577081273524113,
+        "fit_matched_mean": 93.389766010164,
+        "fit_all_mean": 86.3611111111111,
+        "wait_hrs_mean": 10.180656230865601,
+        "wait_days_mean": 1.2725820288582002,
+        "p90_hrs_mean": 13.110729666199335,
+        "p90_days_mean": 1.6388412082749169,
+        "sla_16h_mean": 99.02777777777779,
+        "rho_mgr_mean": 8.494450183716436,
+        "rho_cskh_mean": 11.249889944833273,
+        "little_L_wip": 2.5451640577164003,
+        "stage_cskh_hrs": 1.697654416882984,
+        "stage_match_hrs": 4.939561779582375,
+        "stage_trial_hrs": 3.543440034400243
+      }
+    ],
+    [
+      75,
+      {
+        "match_rate_mean": 64.55555555555556,
+        "match_rate_std": 7.127585084430944,
+        "fit_matched_mean": 95.58216563761636,
+        "fit_all_mean": 61.71111111111111,
+        "wait_hrs_mean": 23.740769691367646,
+        "wait_days_mean": 2.9675962114209558,
+        "p90_hrs_mean": 33.176159211983396,
+        "p90_days_mean": 4.1470199014979245,
+        "sla_16h_mean": 13.444444444444445,
+        "rho_mgr_mean": 62.37254014518231,
+        "rho_cskh_mean": 16.93565476837959,
+        "little_L_wip": 7.4189905285523885,
+        "stage_cskh_hrs": 1.9910896170966648,
+        "stage_match_hrs": 16.551961274076074,
+        "stage_trial_hrs": 5.197718800194908,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 7.25,
+          "CENTER_CANNOT_SERVE": 19.333333333333332
+        }
+      },
+      {
+        "match_rate_mean": 91.55555555555556,
+        "match_rate_std": 5.845753972429292,
+        "fit_matched_mean": 93.62717779309713,
+        "fit_all_mean": 85.71111111111111,
+        "wait_hrs_mean": 10.267695884702794,
+        "wait_days_mean": 1.2834619855878493,
+        "p90_hrs_mean": 13.161738657247144,
+        "p90_days_mean": 1.645217332155893,
+        "sla_16h_mean": 98.33333333333336,
+        "rho_mgr_mean": 10.684383031009524,
+        "rho_cskh_mean": 13.916230021672433,
+        "little_L_wip": 3.208654963969623,
+        "stage_cskh_hrs": 1.6728467371791094,
+        "stage_match_hrs": 5.014029119560937,
+        "stage_trial_hrs": 3.580820027962748
+      }
+    ],
+    [
+      90,
+      {
+        "match_rate_mean": 65.27777777777779,
+        "match_rate_std": 5.775729693981738,
+        "fit_matched_mean": 95.98713253583497,
+        "fit_all_mean": 62.68518518518518,
+        "wait_hrs_mean": 24.044024748815236,
+        "wait_days_mean": 3.0055030936019045,
+        "p90_hrs_mean": 33.22818235311044,
+        "p90_days_mean": 4.153522794138805,
+        "sla_16h_mean": 10.833333333333334,
+        "rho_mgr_mean": 72.5875309811696,
+        "rho_cskh_mean": 20.278241182082827,
+        "little_L_wip": 9.016509280805714,
+        "stage_cskh_hrs": 2.0327656408208745,
+        "stage_match_hrs": 16.71119614796583,
+        "stage_trial_hrs": 5.300062960028531,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 10.25,
+          "CENTER_CANNOT_SERVE": 21.0
+        }
+      },
+      {
+        "match_rate_mean": 87.5,
+        "match_rate_std": 4.867059852204232,
+        "fit_matched_mean": 94.3015954619836,
+        "fit_all_mean": 82.51851851851852,
+        "wait_hrs_mean": 10.293510281447741,
+        "wait_days_mean": 1.2866887851809676,
+        "p90_hrs_mean": 13.281539188194797,
+        "p90_days_mean": 1.6601923985243496,
+        "sla_16h_mean": 98.42592592592592,
+        "rho_mgr_mean": 12.811002597593502,
+        "rho_cskh_mean": 16.989737882869612,
+        "little_L_wip": 3.860066355542903,
+        "stage_cskh_hrs": 1.6874585399208772,
+        "stage_match_hrs": 5.049112045996171,
+        "stage_trial_hrs": 3.556939695530693
+      }
+    ]
+  ],
+  "sensitivity_tutors": [
+    [
+      6,
+      {
+        "match_rate_mean": 50.138888888888886,
+        "match_rate_std": 7.18338918943653,
+        "fit_matched_mean": 94.57314296313164,
+        "fit_all_mean": 47.361111111111114,
+        "wait_hrs_mean": 24.020907210217942,
+        "wait_days_mean": 3.0026134012772427,
+        "p90_hrs_mean": 32.19595919471157,
+        "p90_days_mean": 4.024494899338946,
+        "sla_16h_mean": 12.222222222222221,
+        "rho_mgr_mean": 54.8105382795547,
+        "rho_cskh_mean": 14.748411439437527,
+        "little_L_wip": 6.0052268025544855,
+        "stage_cskh_hrs": 1.9339084397904163,
+        "stage_match_hrs": 17.626821322173274,
+        "stage_trial_hrs": 4.4601774482542575,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 8.083333333333334,
+          "CENTER_CANNOT_SERVE": 21.833333333333332
+        }
+      },
+      {
+        "match_rate_mean": 75.27777777777777,
+        "match_rate_std": 5.603955833842227,
+        "fit_matched_mean": 92.09532983189588,
+        "fit_all_mean": 69.30555555555556,
+        "wait_hrs_mean": 9.883328631393095,
+        "wait_days_mean": 1.2354160789241369,
+        "p90_hrs_mean": 12.728677869049648,
+        "p90_days_mean": 1.591084733631206,
+        "sla_16h_mean": 99.02777777777777,
+        "rho_mgr_mean": 8.472096362671962,
+        "rho_cskh_mean": 11.227552316483708,
+        "little_L_wip": 2.4708321578482737,
+        "stage_cskh_hrs": 1.6055694856655742,
+        "stage_match_hrs": 4.952775726873626,
+        "stage_trial_hrs": 3.324983418853895
+      }
+    ],
+    [
+      8,
+      {
+        "match_rate_mean": 56.25,
+        "match_rate_std": 6.90963497990708,
+        "fit_matched_mean": 94.76221586756076,
+        "fit_all_mean": 53.27777777777778,
+        "wait_hrs_mean": 23.516379676277705,
+        "wait_days_mean": 2.939547459534713,
+        "p90_hrs_mean": 31.856943355066345,
+        "p90_days_mean": 3.982117919383293,
+        "sla_16h_mean": 14.305555555555555,
+        "rho_mgr_mean": 52.27671124293102,
+        "rho_cskh_mean": 14.364615197309861,
+        "little_L_wip": 5.879094919069426,
+        "stage_cskh_hrs": 1.9438694430507881,
+        "stage_match_hrs": 16.76907416306418,
+        "stage_trial_hrs": 4.803436070162736,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 5.666666666666667,
+          "CENTER_CANNOT_SERVE": 20.583333333333332
+        }
+      },
+      {
+        "match_rate_mean": 85.41666666666667,
+        "match_rate_std": 4.621056877670587,
+        "fit_matched_mean": 91.87645947802999,
+        "fit_all_mean": 78.47222222222221,
+        "wait_hrs_mean": 10.045165072685258,
+        "wait_days_mean": 1.2556456340856572,
+        "p90_hrs_mean": 12.899726625628459,
+        "p90_days_mean": 1.6124658282035573,
+        "sla_16h_mean": 99.02777777777777,
+        "rho_mgr_mean": 8.593535207635378,
+        "rho_cskh_mean": 11.197703564333265,
+        "little_L_wip": 2.5112912681713144,
+        "stage_cskh_hrs": 1.5578760629105644,
+        "stage_match_hrs": 4.959980813132891,
+        "stage_trial_hrs": 3.5273081966418043
+      }
+    ],
+    [
+      10,
+      {
+        "match_rate_mean": 63.055555555555564,
+        "match_rate_std": 8.814795362568015,
+        "fit_matched_mean": 97.23350713394636,
+        "fit_all_mean": 61.30555555555554,
+        "wait_hrs_mean": 21.883691038606134,
+        "wait_days_mean": 2.7354613798257668,
+        "p90_hrs_mean": 29.81115513415766,
+        "p90_days_mean": 3.7263943917697073,
+        "sla_16h_mean": 19.999999999999996,
+        "rho_mgr_mean": 47.83718121174099,
+        "rho_cskh_mean": 13.349260679858922,
+        "little_L_wip": 5.4709227596515335,
+        "stage_cskh_hrs": 1.8613105279083142,
+        "stage_match_hrs": 14.826824576505857,
+        "stage_trial_hrs": 5.195555934191959,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 5.583333333333333,
+          "CENTER_CANNOT_SERVE": 16.583333333333332
+        }
+      },
+      {
+        "match_rate_mean": 93.8888888888889,
+        "match_rate_std": 3.2867109906108976,
+        "fit_matched_mean": 93.61367925875574,
+        "fit_all_mean": 87.8888888888889,
+        "wait_hrs_mean": 10.436442770031443,
+        "wait_days_mean": 1.3045553462539303,
+        "p90_hrs_mean": 13.583808534347456,
+        "p90_days_mean": 1.697976066793432,
+        "sla_16h_mean": 98.05555555555554,
+        "rho_mgr_mean": 8.524595347867601,
+        "rho_cskh_mean": 11.387110762061752,
+        "little_L_wip": 2.6091106925078607,
+        "stage_cskh_hrs": 1.7722053328727692,
+        "stage_match_hrs": 4.991287887237095,
+        "stage_trial_hrs": 3.672949549921579
+      }
+    ],
+    [
+      12,
+      {
+        "match_rate_mean": 62.22222222222222,
+        "match_rate_std": 8.452846697057186,
+        "fit_matched_mean": 97.31031156276254,
+        "fit_all_mean": 60.555555555555564,
+        "wait_hrs_mean": 21.892949622323446,
+        "wait_days_mean": 2.7366187027904307,
+        "p90_hrs_mean": 30.068813770653293,
+        "p90_days_mean": 3.7586017213316616,
+        "sla_16h_mean": 21.38888888888889,
+        "rho_mgr_mean": 47.97720388970826,
+        "rho_cskh_mean": 13.302827879141345,
+        "little_L_wip": 5.4732374055808615,
+        "stage_cskh_hrs": 1.984696326831194,
+        "stage_match_hrs": 14.829995138369059,
+        "stage_trial_hrs": 5.0782581571231935,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 6.666666666666667,
+          "CENTER_CANNOT_SERVE": 16.0
+        }
+      },
+      {
+        "match_rate_mean": 91.94444444444444,
+        "match_rate_std": 5.520724142875495,
+        "fit_matched_mean": 93.46867428779036,
+        "fit_all_mean": 85.8611111111111,
+        "wait_hrs_mean": 10.208470967750257,
+        "wait_days_mean": 1.2760588709687821,
+        "p90_hrs_mean": 13.177951055021515,
+        "p90_days_mean": 1.6472438818776893,
+        "sla_16h_mean": 98.6111111111111,
+        "rho_mgr_mean": 8.460607237889741,
+        "rho_cskh_mean": 11.093242173540668,
+        "little_L_wip": 2.5521177419375642,
+        "stage_cskh_hrs": 1.6957123537963852,
+        "stage_match_hrs": 4.97302089050315,
+        "stage_trial_hrs": 3.539737723450722
+      }
+    ]
+  ],
+  "sensitivity_prefs": [
+    [
+      1,
+      {
+        "match_rate_mean": 60.83333333333334,
+        "match_rate_std": 8.806037491192976,
+        "fit_matched_mean": 96.36465426467227,
+        "fit_all_mean": 58.63888888888889,
+        "wait_hrs_mean": 22.778009268807608,
+        "wait_days_mean": 2.847251158600951,
+        "p90_hrs_mean": 31.74177998232614,
+        "p90_days_mean": 3.9677224977907675,
+        "sla_16h_mean": 17.499999999999996,
+        "rho_mgr_mean": 49.39240473774502,
+        "rho_cskh_mean": 13.673304356684184,
+        "little_L_wip": 5.694502317201902,
+        "stage_cskh_hrs": 1.9587173066752988,
+        "stage_match_hrs": 15.759585599385247,
+        "stage_trial_hrs": 5.059706362747057,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 5.833333333333333,
+          "CENTER_CANNOT_SERVE": 17.666666666666668
+        }
+      },
+      {
+        "match_rate_mean": 58.333333333333336,
+        "match_rate_std": 5.046083923495819,
+        "fit_matched_mean": 100.0,
+        "fit_all_mean": 58.333333333333336,
+        "wait_hrs_mean": 9.692222493036878,
+        "wait_days_mean": 1.2115278116296098,
+        "p90_hrs_mean": 12.842603046948796,
+        "p90_days_mean": 1.6053253808685994,
+        "sla_16h_mean": 99.02777777777779,
+        "rho_mgr_mean": 8.532870008861412,
+        "rho_cskh_mean": 11.22212308025717,
+        "little_L_wip": 2.4230556232592195,
+        "stage_cskh_hrs": 1.6952562323196705,
+        "stage_match_hrs": 4.957666348655056,
+        "stage_trial_hrs": 3.0392999120621504
+      }
+    ],
+    [
+      2,
+      {
+        "match_rate_mean": 60.83333333333334,
+        "match_rate_std": 8.806037491192976,
+        "fit_matched_mean": 96.36465426467227,
+        "fit_all_mean": 58.63888888888889,
+        "wait_hrs_mean": 22.778009268807608,
+        "wait_days_mean": 2.847251158600951,
+        "p90_hrs_mean": 31.74177998232614,
+        "p90_days_mean": 3.9677224977907675,
+        "sla_16h_mean": 17.499999999999996,
+        "rho_mgr_mean": 49.39240473774502,
+        "rho_cskh_mean": 13.673304356684184,
+        "little_L_wip": 5.694502317201902,
+        "stage_cskh_hrs": 1.9587173066752988,
+        "stage_match_hrs": 15.759585599385247,
+        "stage_trial_hrs": 5.059706362747057,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 5.833333333333333,
+          "CENTER_CANNOT_SERVE": 17.666666666666668
+        }
+      },
+      {
+        "match_rate_mean": 87.77777777777779,
+        "match_rate_std": 3.621779114001469,
+        "fit_matched_mean": 94.171384404835,
+        "fit_all_mean": 82.66666666666667,
+        "wait_hrs_mean": 10.210878179980007,
+        "wait_days_mean": 1.2763597724975009,
+        "p90_hrs_mean": 13.234506671708672,
+        "p90_days_mean": 1.654313333963584,
+        "sla_16h_mean": 98.75,
+        "rho_mgr_mean": 8.532870008861412,
+        "rho_cskh_mean": 11.22212308025717,
+        "little_L_wip": 2.5527195449950018,
+        "stage_cskh_hrs": 1.6952562323196705,
+        "stage_match_hrs": 4.957666348655056,
+        "stage_trial_hrs": 3.5579555990052807
+      }
+    ],
+    [
+      3,
+      {
+        "match_rate_mean": 60.83333333333334,
+        "match_rate_std": 8.806037491192976,
+        "fit_matched_mean": 96.36465426467227,
+        "fit_all_mean": 58.63888888888889,
+        "wait_hrs_mean": 22.778009268807608,
+        "wait_days_mean": 2.847251158600951,
+        "p90_hrs_mean": 31.74177998232614,
+        "p90_days_mean": 3.9677224977907675,
+        "sla_16h_mean": 17.499999999999996,
+        "rho_mgr_mean": 49.39240473774502,
+        "rho_cskh_mean": 13.673304356684184,
+        "little_L_wip": 5.694502317201902,
+        "stage_cskh_hrs": 1.9587173066752988,
+        "stage_match_hrs": 15.759585599385247,
+        "stage_trial_hrs": 5.059706362747057,
+        "closed_lost_avg": {
+          "SCHEDULE_MISMATCH": 5.833333333333333,
+          "CENTER_CANNOT_SERVE": 17.666666666666668
+        }
+      },
+      {
+        "match_rate_mean": 92.08333333333333,
+        "match_rate_std": 3.856512049143005,
+        "fit_matched_mean": 93.25706570335251,
+        "fit_all_mean": 85.86111111111113,
+        "wait_hrs_mean": 10.281486670534468,
+        "wait_days_mean": 1.2851858338168085,
+        "p90_hrs_mean": 13.253685556751114,
+        "p90_days_mean": 1.6567106945938892,
+        "sla_16h_mean": 98.75,
+        "rho_mgr_mean": 8.532870008861412,
+        "rho_cskh_mean": 11.22212308025717,
+        "little_L_wip": 2.570371667633617,
+        "stage_cskh_hrs": 1.6952562323196705,
+        "stage_match_hrs": 4.957666348655056,
+        "stage_trial_hrs": 3.6285640895597417
+      }
+    ]
+  ],
+  "pareto_frontier": [
+    {
+      "gamma_cost": 10.0,
+      "match_rate": 91.25,
+      "fit_all": 84.91666666666667,
+      "classes_opened": 33.25
+    },
+    {
+      "gamma_cost": 1065.0,
+      "match_rate": 89.44444444444444,
+      "fit_all": 84.05555555555556,
+      "classes_opened": 32.166666666666664
+    },
+    {
+      "gamma_cost": 1085.0,
+      "match_rate": 85.27777777777776,
+      "fit_all": 80.72222222222221,
+      "classes_opened": 29.666666666666668
+    },
+    {
+      "gamma_cost": 1105.0,
+      "match_rate": 50.694444444444436,
+      "fit_all": 46.138888888888886,
+      "classes_opened": 8.916666666666666
+    }
+  ]
+}

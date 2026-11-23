@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Báo cáo Checkpoint L3A - Catplus Platform</title>
+<style>
+
+@page {
+    size: A4 portrait;
+    margin: 14mm 12mm 14mm 12mm;
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.5;
+    color: #1a202c;
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    font-size: 16pt;
+    color: #1a365d;
+    border-bottom: 2.5px solid #2b6cb0;
+    padding-bottom: 5px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+h2 {
+    font-size: 12.5pt;
+    color: #2b6cb0;
+    border-bottom: 1px solid #cbd5e0;
+    padding-bottom: 3px;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    page-break-after: avoid;
+}
+h3 {
+    font-size: 10.5pt;
+    color: #2d3748;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 8pt;
+    page-break-inside: auto;
+}
+tr {
+    page-break-inside: avoid;
+}
+th, td {
+    border: 1px solid #cbd5e0;
+    padding: 5px 7px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+    font-weight: 600;
+}
+blockquote {
+    border-left: 4px solid #3182ce;
+    margin: 8px 0;
+    padding: 6px 12px;
+    background-color: #ebf8ff;
+    color: #2c5282;
+    font-style: italic;
+    font-size: 9.5pt;
+}
+pre {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 6px;
+    font-size: 7.5pt;
+    overflow-x: auto;
+}
+code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 8pt;
+    background: #edf2f7;
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+ul, ol {
+    margin: 4px 0;
+    padding-left: 18px;
+}
+li {
+    margin-bottom: 2px;
+}
+hr {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 12px 0;
+}
+.mermaid {
+    text-align: center;
+    margin: 10px auto;
+    font-size: 8pt;
+}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({{startOnLoad: true, theme: 'neutral', securityLevel: 'loose'}});
+</script>
+</head>
+<body>
+<h1>BÁO CÁO BÀI TẬP CHECKPOINT L3A — KHOA HỌC DỊCH VỤ</h1>
+<h2>Hành trình Khách hàng (Customer Journey Map) &amp; Bản thiết kế Dịch vụ (Service Blueprint AS-IS)</h2>
+<ul>
+<li><strong>Học phần:</strong> Khoa học Dịch vụ (Service Science)</li>
+<li><strong>Giảng viên hướng dẫn:</strong> ThS. Nguyễn Thị Cẩm Vân</li>
+<li><strong>Đơn vị:</strong> Khoa Công nghệ Thông tin — Trường Đại học Công nghệ, ĐHQGHN</li>
+<li><strong>Đề tài nghiên cứu:</strong> Hệ thống Dịch vụ Đào tạo Lập trình Thực chiến Catplus Platform</li>
+<li><strong>Quy trình trọng tâm đi sâu:</strong> <strong>"Quy trình Giải bài tập Lập trình, Chấm điểm Tự động và Nhận Hỗ trợ Sư phạm từ Trợ giảng (Programming Homework, Automated OJ Judging &amp; Tutor Mentoring Process)"</strong></li>
+<li><strong>Tài liệu tham khảo cơ sở:</strong> Bitner et al. (2008), Shostack (1984), Sampson (2001 - UST), Alter (2013 - WSF), Vargo &amp; Lusch (2016 - S-D Logic), Slide L2A/L2B/L3A.</li>
+</ul>
+<hr />
+<h2>MỤC LỤC</h2>
+<ol>
+<li><a href="#1-phần-đối-chiếu-bản-đồ-tài-nguyên--giá-trị-resourcevalue-map-từ-checkpoint-l2">Phần đối chiếu: Bản đồ Tài nguyên – Giá trị (Resource–Value Map từ Checkpoint L2)</a></li>
+<li><a href="#2-xác-định-phạm-vi-quy-trình-và-khách-hàng-process-scope">Xác định Phạm vi Quy trình và Khách hàng (Process Scope)</a></li>
+<li><a href="#3-bản-đồ-hành-trình-khách-hàng-as-is-customer-journey-map">Bản đồ Hành trình Khách hàng AS-IS (Customer Journey Map)</a></li>
+<li><a href="#4-bản-thiết-kế-dịch-vụ-as-is-service-blueprint">Bản thiết kế Dịch vụ AS-IS (Service Blueprint)</a></li>
+<li><a href="#5-chẩn-đoán-vấn-đề-trên-blueprint-annotations">Chẩn đoán Vấn đề trên Blueprint (Annotations: Failure, Waiting, Handoff, Rework, Recovery)</a></li>
+<li><a href="#6-liên-hệ-chẩn-đoán-với-bản-đồ-tài-nguyên--giá-trị-trace-to-l2">Liên hệ Chẩn đoán với Bản đồ Tài nguyên – Giá trị (Trace to L2)</a></li>
+<li><a href="#7-đề-xuất-giả-thuyết-cải-tiến-to-be-hypothesis">Đề xuất Giả thuyết Cải tiến (TO-BE Hypothesis)</a></li>
+<li><a href="#8-kết-luận-và-chuẩn-bị-cho-mô-hình-hóa-bpmn-20-l3b">Kết luận và Chuẩn bị cho Mô hình hóa BPMN 2.0 (L3B)</a></li>
+</ol>
+<hr />
+<h2>1. Phần đối chiếu: Bản đồ Tài nguyên – Giá trị (Resource–Value Map từ Checkpoint L2)</h2>
+<p>Để đảm bảo tính nhất quán xuyên suốt học phần, dưới đây là bản đối chiếu <strong>Resource–Value Map</strong> của nền tảng Catplus đã được xây dựng từ Checkpoint L2 theo chuẩn Service-Dominant Logic (Vargo &amp; Lusch 2016):</p>
+<h3>1.1. Bảng đối chiếu thành phần Tài nguyên – Giá trị Catplus</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Thành phần S-D Logic</th>
+<th style="text-align: left;">Hiện diện cụ thể trong Nền tảng Catplus</th>
+<th style="text-align: left;">Ý nghĩa phân tích dịch vụ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Tác nhân (Actors)</strong></td>
+<td style="text-align: left;">* <strong>Học viên (Student)</strong> — Người thụ hưởng chính.<br><em> </em><em>Trợ giảng (Tutor)</em><em> — Người cung cấp dịch vụ sư phạm trực tiếp.<br></em> <strong>Đội ngũ CSKH &amp; Quản lý học vụ</strong> — Điều phối và giám sát.<br><em> </em><em>Hạ tầng công nghệ Catplus</em>* — Nền tảng trung gian tích hợp.</td>
+<td style="text-align: left;">Các thực thể tham gia mạng lưới trao đổi dịch vụ Actor-to-Actor (A2A).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Tài nguyên Toán tử (Operant Resources)</strong> <em>(Tri thức, kỹ năng động)</em></td>
+<td style="text-align: left;">* <strong>Học viên:</strong> Tư duy giải thuật, khả năng tự đọc hiểu đề, sự kiên trì, kỹ năng tự debug.<br><em> </em><em>Tutor:</em><em> Tri thức giải thuật chuyên sâu, kỹ năng sư phạm nhận diện lỗi sai, sự thấu cảm.<br></em> <strong>Hệ thống Catplus:</strong> Thuật toán biên dịch/chấm DMOJ, cơ chế điều phối phân quyền.</td>
+<td style="text-align: left;">Yếu tố cốt lõi tạo ra lợi thế cạnh tranh động; quyết định chất lượng của quá trình đồng tạo giá trị.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Tài nguyên Toán hạng (Operand Resources)</strong> <em>(Phương tiện tĩnh, tài sản số)</em></td>
+<td style="text-align: left;">* Kho gói bài tập &amp; bộ testcase chuẩn hóa từ Codeforces Polygon.<br><em> Mã nguồn bài nộp của học viên (Source Code Artifact).<br></em> Máy chủ sandbox DMOJ, CPU/RAM, Database PostgreSQL.<br>* Bản ghi học tập, bảng điểm, log phán quyết (Verdicts).</td>
+<td style="text-align: left;">Phương tiện số chịu sự tác động của tài nguyên toán tử để chuyển tải giá trị dịch vụ.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Tích hợp Tài nguyên (Resource Integration)</strong></td>
+<td style="text-align: left;">* Học viên tích hợp đề bài (operand) với tư duy thuật toán (operant) $\rightarrow$ sinh ra mã nguồn.<br><em> Hệ thống tích hợp mã nguồn với máy chấm DMOJ $\rightarrow$ sinh ra phán quyết thực thi (<code>AC</code>, <code>WA</code>, <code>TLE</code>).<br></em> Tutor tích hợp lỗi sai của học viên với tri thức sư phạm $\rightarrow$ sinh ra lời gợi ý định hướng (<em>Hint</em>).</td>
+<td style="text-align: left;">Giá trị không tồn tại sẵn trong phần mềm hay đề bài; giá trị chỉ nảy sinh khi các tài nguyên được phối hợp.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Đề xuất Giá trị (Value Proposition)</strong></td>
+<td style="text-align: left;"><em>"Môi trường luyện lập trình thực chiến với hệ thống chấm bài tự động tức thì, kết hợp sự đồng hành kèm cặp sư phạm 1-1 từ Trợ giảng giúp học viên làm chủ tư duy giải thuật."</em></td>
+<td style="text-align: left;">Lời hứa dịch vụ từ phía Catplus; doanh nghiệp không thể tự tạo ra giá trị mà chỉ đưa ra đề xuất giá trị (FP7).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. Đầu ra (Output)</strong></td>
+<td style="text-align: left;">Mã nộp được chấp nhận (<code>AC 100/100</code>), điểm số trên hệ thống, dòng nhận xét (comment) của Tutor.</td>
+<td style="text-align: left;">Kết quả thực thể/kỹ thuật quan sát được sau các điểm tiếp xúc dịch vụ.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>7. Kết quả (Outcome)</strong></td>
+<td style="text-align: left;">Học viên thấu hiểu bản chất lỗi sai, tối ưu hóa được độ phức tạp thuật toán, làm chủ dạng bài.</td>
+<td style="text-align: left;">Sự biến đổi trạng thái tích cực trong năng lực và hiểu biết của người học.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>8. Giá trị trong bối cảnh (Value-in-context)</strong></td>
+<td style="text-align: left;">Sự tự tin giải quyết vấn đề, giảm căng thẳng khi gặp bài khó, đạt giải cao trong kỳ thi HSG/ICPC hoặc vượt qua phỏng vấn tuyển dụng kỹ thuật.</td>
+<td style="text-align: left;">Đánh giá hiện tượng học của người thụ hưởng theo mục tiêu cá nhân (FP10).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>9. Thiết chế &amp; Quy tắc (Institutions / Rules)</strong></td>
+<td style="text-align: left;">* <strong>Quy chuẩn lập trình:</strong> Giới hạn thời gian (Time Limit 1.0s), bộ nhớ (Memory Limit 256MB), cấm sao chép code.<br><em> </em><em>SLA Dịch vụ:</em>* Quy định Tutor phản hồi thắc mắc học viên trong ca trực $&lt; 15$ phút.</td>
+<td style="text-align: left;">Chuẩn mực, luật lệ điều phối niềm tin và sự phối hợp giữa các bên (Axiom 5 / FP11).</td>
+</tr>
+</tbody>
+</table>
+<div class="mermaid">flowchart LR
+    subgraph L2_RVM[&quot;TÓM TẮT RESOURCE-VALUE MAP (L2 TRACE)&quot;]
+        direction TB
+        Act[&quot;TÁC NHÂN&lt;br&gt;Học viên &amp; Tutor&quot;] --- Res[&quot;TÀI NGUYÊN&lt;br&gt;Operant (Sư phạm) &amp; Operand (Code, DMOJ)&quot;]
+        Res --- Int[&quot;TÍCH HỢP&lt;br&gt;Học viên code + DMOJ test + Tutor hint&quot;]
+        Int --- VP[&quot;ĐỀ XUẤT GIÁ TRỊ&lt;br&gt;Chấm tức thì + Kèm 1-1&quot;]
+        VP --- Out[&quot;OUTPUT &amp; OUTCOME&lt;br&gt;AC 100% &amp; Làm chủ giải thuật&quot;]
+        Out --- Val[&quot;VALUE-IN-CONTEXT&lt;br&gt;Tự tin &amp; Năng lực thực chiến&quot;]
+    end
+</div>
+<hr />
+<h2>2. Xác định Phạm vi Quy trình và Khách hàng (Process Scope)</h2>
+<h3>2.1. Khách hàng / Người sử dụng là ai?</h3>
+<ul>
+<li><strong>Khách hàng trực tiếp:</strong> <strong>Học viên lập trình (Student)</strong> của trung tâm Catplus.</li>
+<li><strong>Đặc điểm Persona:</strong> Học viên đang theo học các khóa Lập trình Cấu trúc dữ liệu &amp; Giải thuật. Học viên có mục tiêu nâng cao tư duy, luyện thi học sinh giỏi hoặc chuẩn bị phỏng vấn kỹ thuật. Khi gặp bài toán hóc búa, học viên dễ rơi vào tâm lý hoang mang, cần phản hồi sư phạm kịp thời để duy trì nhịp độ học tập.</li>
+</ul>
+<h3>2.2. Điểm kích hoạt (Trigger)</h3>
+<ul>
+<li><strong>Trigger:</strong> Học viên đăng nhập vào hệ thống Learning Web, mở một bài tập lập trình được giao trong buổi học (hoặc bài tập về nhà sắp đến hạn) và bắt đầu phân tích đề bài.</li>
+</ul>
+<h3>2.3. Kết quả đầu ra và kết quả dịch vụ (Outcome)</h3>
+<ul>
+<li><strong>Kết thúc thành công (Ideal Outcome):</strong> Học viên vượt qua toàn bộ bộ testcase, bài nộp đạt trạng thái <strong><code>Accepted (AC 100/100)</code></strong>, hiểu rõ tư duy tối ưu giải thuật, hệ thống ghi nhận hoàn thành bài tập trên Dashboard tiến độ học vụ.</li>
+<li><strong>Kết thúc phục hồi (Recovery Outcome):</strong> Trường hợp bài toán vượt quá khả năng tự giải, học viên nhận được lời gợi ý (<em>Hint</em>) đúng trọng tâm từ Tutor, tự mình sửa lại mã nguồn thành công và làm chủ kiến thức nền tảng.</li>
+<li><strong>Kết thúc thất bại (Unfavorable Outcome):</strong> Học viên nộp bài lỗi liên tục, chờ Tutor quá lâu không có phản hồi, nản chí và bỏ dở bài tập (<em>Value destruction</em>).</li>
+</ul>
+<h3>2.4. Trình tự 6 bước tương tác chính</h3>
+<ol>
+<li><strong>Bước 1 — Tiếp nhận &amp; Phân tích đề bài:</strong> Đọc hiểu yêu cầu toán học, ràng buộc thời gian/bộ nhớ và các testcase ví dụ.</li>
+<li><strong>Bước 2 — Hiện thực hóa mã nguồn &amp; Thử nghiệm cục bộ:</strong> Viết mã nguồn trên trình soạn thảo, kiểm thử với các ví dụ mẫu.</li>
+<li><strong>Bước 3 — Nộp bài lên hệ thống &amp; Chờ chấm tự động:</strong> Bấm nút Submit, hệ thống đóng gói mã nguồn và đưa vào hàng đợi DMOJ.</li>
+<li><strong>Bước 4 — Tiếp nhận phán quyết &amp; Rơi vào bế tắc:</strong> Máy chấm trả về <code>Wrong Answer (WA)</code> hoặc <code>Time Limit Exceeded (TLE)</code>. Học viên không rõ testcase sai, thử sửa mò và nộp lại nhiều lần.</li>
+<li><strong>Bước 5 — Gửi yêu cầu trợ giúp &amp; Chờ đợi phản hồi:</strong> Học viên gửi link bài nộp vào kênh hỗ trợ của Tutor và chờ đợi gia sư vào ca trực kiểm tra.</li>
+<li><strong>Bước 6 — Nhận giải thích sư phạm &amp; Hoàn thiện bài nộp:</strong> Tutor phân tích lỗi sai, đưa ra gợi ý tư duy; học viên sửa lại thuật toán và nộp đạt <code>AC</code>.</li>
+</ol>
+<hr />
+<h2>3. Bản đồ Hành trình Khách hàng AS-IS (Customer Journey Map)</h2>
+<p>Customer Journey Map thể hiện trải nghiệm của học viên theo góc nhìn từ ngoài vào (<em>Outside-In</em>), bám sát các cung bậc cảm xúc, mục tiêu và khó khăn thực tế mà học viên gặp phải.</p>
+<h3>3.1. Bảng chi tiết Hành trình Khách hàng AS-IS</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Giai đoạn (Stage)</th>
+<th style="text-align: left;">Mục tiêu của Học viên</th>
+<th style="text-align: left;">Hành động cụ thể</th>
+<th style="text-align: left;">Điểm/Kênh tiếp xúc (Touchpoint)</th>
+<th style="text-align: left;">Bằng chứng / Kết quả (Evidence)</th>
+<th style="text-align: left;">Cảm xúc &amp; Điểm nghẽn (Pain Points)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. Khám phá &amp; Đọc đề</strong> <em>(Comprehension)</em></td>
+<td style="text-align: left;">Hiểu đúng yêu cầu bài toán và các ràng buộc kỹ thuật.</td>
+<td style="text-align: left;">Đọc đề bài, phân tích testcase ví dụ, phác thảo giải thuật ra giấy nháp.</td>
+<td style="text-align: left;">Giao diện chi tiết bài tập trên Learning Web (<code>apps/learning-web</code>).</td>
+<td style="text-align: left;">Đề bài hiển thị rõ ràng, giới hạn Time/Memory limit, I/O specifications.</td>
+<td style="text-align: left;">😀 <strong>Tích cực &amp; Hào hứng:</strong> Đề bài rõ ràng, sẵn sàng giải quyết thử thách.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. Viết mã nguồn</strong> <em>(Implementation)</em></td>
+<td style="text-align: left;">Chuyển hóa ý tưởng thành mã nguồn chạy đúng với test mẫu.</td>
+<td style="text-align: left;">Viết mã nguồn C++/Python trên Web IDE hoặc VS Code; chạy thử nghiệm mẫu.</td>
+<td style="text-align: left;">Trình biên tập mã nguồn (Code Editor) trên Learning Web.</td>
+<td style="text-align: left;">Mã nguồn hoàn chỉnh, biên dịch cục bộ không có lỗi cú pháp.</td>
+<td style="text-align: left;">🙂 <strong>Bình thường:</strong> Tập trung tư duy logic và triển khai thuật toán.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. Nộp bài &amp; Chờ chấm</strong> <em>(Submission)</em></td>
+<td style="text-align: left;">Gửi mã nguồn lên máy chủ để xác nhận tính chính xác.</td>
+<td style="text-align: left;">Nhấn nút "Nộp bài" (Submit), theo dõi trạng thái tiến trình chấm bài.</td>
+<td style="text-align: left;">Nút "Submit", trang chi tiết Submission trên Learning Web.</td>
+<td style="text-align: left;">Mã <code>Submission ID</code>, biểu tượng tải "Pending / In Progress...".</td>
+<td style="text-align: left;">😐 <strong>Hồi hộp:</strong> Chờ đợi kết quả từ hệ thống chấm tự động.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. Tiếp nhận phán quyết &amp; Bế tắc</strong> <em>(Verdict &amp; Failure)</em></td>
+<td style="text-align: left;">Xem kết quả chấm bài để biết thuật toán có tối ưu không.</td>
+<td style="text-align: left;">Xem kết quả báo <code>Wrong Answer</code> (test 14/40). Thử sửa vài dòng code rồi nộp lại 4-5 lần vẫn bị lỗi.</td>
+<td style="text-align: left;">Bảng kết quả Submission (<code>apps/learning-web/submissions</code>).</td>
+<td style="text-align: left;">Nhãn đỏ <code>WA</code> hoặc <code>TLE</code>, thời gian chạy: 1.05s, Bộ nhớ: 15.2MB. <strong>Không có input lỗi!</strong></td>
+<td style="text-align: left;">😫 <strong>[PAIN POINT 1]: Ức chế &amp; Bế tắc.</strong> Máy chấm là hộp đen (<em>Black-box</em>), chỉ báo sai mà không nói sai ở trường hợp biên nào. Học viên phải mò mẫm vô vọng.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. Gửi yêu cầu trợ giúp &amp; Chờ đợi</strong> <em>(Help Request &amp; Waiting)</em></td>
+<td style="text-align: left;">Nhận được giải thích hoặc gợi ý từ Tutor để thoát khỏi bế tắc.</td>
+<td style="text-align: left;">Chụp ảnh màn hình, gửi tin nhắn vào kênh hỏi bài: <em>"Anh ơi xem giúp em bài này sao test 14 bị WA với ạ"</em>. Ngồi chờ phản hồi.</td>
+<td style="text-align: left;">Khung chat hỏi bài / Tutor Feed trên Learning Web.</td>
+<td style="text-align: left;">Tin nhắn đã gửi đi. Không có thông tin thứ tự hàng đợi hay thời gian dự kiến hỗ trợ.</td>
+<td style="text-align: left;">😡 <strong>[PAIN POINT 2]: Sốt ruột &amp; Nản lòng.</strong> Chờ đợi kéo dài (30 phút đến vài tiếng nếu ngoài ca trực), bị trôi tin nhắn. Học viên mất nhịp tập trung (<em>context switch</em>), dễ bỏ dở bài tập.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>6. Nhận hướng dẫn &amp; Hoàn thành</strong> <em>(Resolution)</em></td>
+<td style="text-align: left;">Hiểu lỗi sai giải thuật, sửa code thành công đạt AC.</td>
+<td style="text-align: left;">Đọc tin nhắn nhận xét của Tutor, nhận ra lỗi tràn số nguyên (integer overflow), sửa lại kiểu <code>long long</code> và nộp lại.</td>
+<td style="text-align: left;">Khung phản hồi của Tutor; thông báo kết quả chấm mới.</td>
+<td style="text-align: left;">Tin nhắn giải thích của Tutor; Nhãn xanh lá <strong><code>Accepted (AC 100/100)</code></strong>; thanh tiến độ bài tập đạt 100%.</td>
+<td style="text-align: left;">😃 <strong>Thỏa mãn &amp; Tự tin:</strong> Hiểu bản chất vấn đề, năng lực giải thuật được nâng cao, củng cố niềm tin vào dịch vụ.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>3.2. Sơ đồ Hành trình Khách hàng AS-IS (Mermaid Journey)</h3>
+<div class="mermaid">journey
+    title HÀNH TRÌNH HỌC VIÊN LÀM BÀI TẬP VÀ GẶP LỖI TRÊN CATPLUS (AS-IS)
+    section 1. Đọc đề bài
+      Đọc đề và phân tích ràng buộc I/O: 5: Học viên
+      Vẽ nháp ý tưởng thuật toán: 4: Học viên
+    section 2. Viết mã nguồn
+      Lập trình trên Web Editor: 4: Học viên
+      Chạy thử thành công testcase mẫu: 4: Học viên
+    section 3. Nộp bài
+      Bấm nút Submit: 3: Học viên
+      Chờ máy chấm DMOJ thực thi: 3: Học viên
+    section 4. Bế tắc (Pain Point 1)
+      Nhận phán quyết WA test 14/40: 1: Học viên
+      Sửa mò nộp lại 5 lần liên tiếp vẫn trượt: 1: Học viên
+    section 5. Chờ đợi Tutor (Pain Point 2)
+      Gửi tin nhắn kêu cứu vào kênh hỏi bài: 2: Học viên
+      Chờ đợi Tutor phản hồi quá lâu (&gt; 45p): 1: Học viên
+    section 6. Hoàn thành
+      Nhận gợi ý lỗi tràn số từ Tutor: 4: Học viên, Tutor
+      Sửa code và nộp lại đạt AC 100%: 5: Học viên
+</div>
+<hr />
+<h2>4. Bản thiết kế Dịch vụ AS-IS (Service Blueprint)</h2>
+<p>Bản thiết kế dịch vụ (<strong>Service Blueprint</strong>) liên kết chặt chẽ trải nghiệm bề nổi của học viên với cấu trúc vận hành con người và hạ tầng kỹ thuật hậu trường của Catplus trên cùng một trục thời gian đồng bộ.</p>
+<h3>4.1. Bảng Ma trận 5 tầng Service Blueprint AS-IS</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Tầng cấu trúc Blueprint</th>
+<th style="text-align: left;">Pha 1: Đọc đề &amp; Viết code</th>
+<th style="text-align: left;">Pha 2: Nộp bài &amp; Đóng gói</th>
+<th style="text-align: left;">Pha 3: Chấm tự động (DMOJ)</th>
+<th style="text-align: left;">Pha 4: Tiếp nhận lỗi &amp; Nộp lại</th>
+<th style="text-align: left;">Pha 5: Yêu cầu Tutor hỗ trợ</th>
+<th style="text-align: left;">Pha 6: Hướng dẫn &amp; Đạt AC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1. BẰNG CHỨNG DỊCH VỤ</strong> <em>(Physical / Digital Evidence)</em></td>
+<td style="text-align: left;">Trang chi tiết bài tập; Giới hạn Time/Memory; Editor soạn thảo code.</td>
+<td style="text-align: left;">Nút Submit chuyển trạng thái Disabled; Hiển thị Submission ID.</td>
+<td style="text-align: left;">Màn hình quay Spinner: <code>Judging...</code>; Hàng đợi chấm bài.</td>
+<td style="text-align: left;">Thẻ đỏ <strong><code>WA (14/40)</code></strong>; Bảng lịch sử 5 lần nộp đỏ rực; Khung code lỗi.</td>
+<td style="text-align: left;">Khung chat hỏi bài; Tin nhắn gửi đi; Dấu tích "Đã gửi".</td>
+<td style="text-align: left;">Khung chat có tin nhắn Tutor; Thẻ xanh <strong><code>Accepted 100/100</code></strong>; Điểm số Dashboard.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2. HÀNH ĐỘNG HỌC VIÊN</strong> <em>(Customer Actions)</em></td>
+<td style="text-align: left;">Đọc yêu cầu bài toán; Viết code thuật toán; Chạy thử test ví dụ.</td>
+<td style="text-align: left;">Bấm nút "Nộp bài" (Submit).</td>
+<td style="text-align: left;">Chờ đợi hệ thống trả kết quả.</td>
+<td style="text-align: left;">Thấy kết quả WA; Sửa mò mã nguồn; Bấm nộp lại nhiều lần <strong>[R1]</strong>.</td>
+<td style="text-align: left;">Chụp ảnh màn hình; Soạn tin nhắn xin hỗ trợ gửi Tutor <strong>[F2]</strong>.</td>
+<td style="text-align: left;">Đọc hướng dẫn của Tutor; Sửa lại thuật toán đúng; Nộp bài lần cuối.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>--- LINE OF INTERACTION ---</em></td>
+<td style="text-align: left;"><em>--- Đường tương tác ---</em></td>
+<td style="text-align: left;"><em>--- (Học viên tiếp xúc ---</em></td>
+<td style="text-align: left;"><em>--- với Giao diện hệ thống ---</em></td>
+<td style="text-align: left;"><em>--- và Nhân viên tiền tuyến) ---</em></td>
+<td style="text-align: left;"><em>--- ---</em></td>
+<td style="text-align: left;"><em>--- ---</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3. HÀNH ĐỘNG TIỀN TUYẾN</strong> <em>(Onstage / Frontstage Actions)</em></td>
+<td style="text-align: left;">Learning Web tải và hiển thị nội dung đề bài chuẩn từ API.</td>
+<td style="text-align: left;">Nhận request nộp bài; Kiểm tra đăng nhập và quyền truy cập bài tập.</td>
+<td style="text-align: left;">Hiển thị tiến trình chấm bài thời gian thực qua WebSocket/Polling.</td>
+<td style="text-align: left;">Hiển thị phán quyết <code>WA</code> hộp đen <strong>[F1]</strong>; Không có gợi ý tự động.</td>
+<td style="text-align: left;">Nhận tin nhắn trong kênh hỏi bài; Hiển thị danh sách câu hỏi chưa trả lời.</td>
+<td style="text-align: left;">Tutor đọc câu hỏi, mở mã nguồn học viên, gõ nhận xét phân tích lỗi sai và gửi lại.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>--- LINE OF VISIBILITY ---</em></td>
+<td style="text-align: left;"><em>--- Đường nhìn thấy ---</em></td>
+<td style="text-align: left;"><em>--- (Phân cách giữa những gì ---</em></td>
+<td style="text-align: left;"><em>--- học viên thấy và ---</em></td>
+<td style="text-align: left;"><em>--- quy trình nội bộ hậu trường) ---</em></td>
+<td style="text-align: left;"><em>--- ---</em></td>
+<td style="text-align: left;"><em>--- ---</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>4. HÀNH ĐỘNG HẬU TRƯỜNG</strong> <em>(Backstage Actions)</em></td>
+<td style="text-align: left;">Hệ thống Academic tải phân phối bài tập theo kế hoạch tuần.</td>
+<td style="text-align: left;">Ghi nhận bản ghi <code>Submission</code> vào bảng cơ sở dữ liệu <code>oj_submission</code>.</td>
+<td style="text-align: left;">Điều phối và giám sát tải hàng đợi chấm bài của các worker.</td>
+<td style="text-align: left;">Lưu trữ phán quyết chi tiết từng testcase (bị giấu kín khỏi học viên).</td>
+<td style="text-align: left;">Trưởng ca trực Tutor phân công người hỗ trợ; Tutor tìm testcase gốc <strong>[H1]</strong>.</td>
+<td style="text-align: left;">Tutor ghi chú tiến độ học viên vào sổ theo dõi học vụ nội bộ.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><em>--- LINE OF INTERNAL INTERACTION ---</em></td>
+<td style="text-align: left;"><em>--- Đường tương tác nội bộ ---</em></td>
+<td style="text-align: left;"><em>--- (Hậu trường gọi các ---</em></td>
+<td style="text-align: left;"><em>--- hệ thống vi dịch vụ ---</em></td>
+<td style="text-align: left;"><em>--- và cơ sở dữ liệu nền tảng) ---</em></td>
+<td style="text-align: left;"><em>--- ---</em></td>
+<td style="text-align: left;"><em>--- ---</em></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>5. QUÁ TRÌNH HỖ TRỢ</strong> <em>(Support Processes)</em></td>
+<td style="text-align: left;">* <code>services/academic</code> (API lớp học, bài tập).<br>* <code>services/polygon-sync</code> (Đồng bộ đề bài).</td>
+<td style="text-align: left;">* <code>services/oj</code> API xác thực và tạo bản ghi bài nộp.</td>
+<td style="text-align: left;">* <code>services/judge-bridge</code> ký claim request.<br><em> <code>infrastructure/dmoj</code> c++ sandbox worker thực thi test </em><em>[W1]</em>*.</td>
+<td style="text-align: left;">* CSDL PostgreSQL cập nhật trạng thái <code>WA</code>.<br>* Cron job dọn dẹp bộ nhớ tạm.</td>
+<td style="text-align: left;">* Kênh Chat Service / WebSocket server trung chuyển tin nhắn thắc mắc <strong>[W2]</strong>.</td>
+<td style="text-align: left;">* <code>services/academic</code> cập nhật trạng thái hoàn thành bài tập và tính điểm chuyên cần.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>4.2. Sơ đồ Service Blueprint AS-IS trực quan (Mermaid Flowchart)</h3>
+<div class="mermaid">flowchart TD
+    classDef evidence fill:#e1f5fe,stroke:#0288d1,stroke-width:1px,color:#01579b;
+    classDef customer fill:#e8f5e9,stroke:#388e3c,stroke-width:1px,color:#1b5e20;
+    classDef frontstage fill:#fff3e0,stroke:#f57c00,stroke-width:1px,color:#e65100;
+    classDef backstage fill:#f3e5f5,stroke:#7b1fa2,stroke-width:1px,color:#4a148c;
+    classDef support fill:#eceff1,stroke:#455a64,stroke-width:1px,color:#263238;
+    classDef annotation fill:#ffebee,stroke:#c62828,stroke-width:2px,stroke-dasharray: 5 5,color:#b71c1c;
+
+    subgraph BLUEPRINT[&quot;BẢN THIẾT KẾ DỊCH VỤ CATPLUS AS-IS (SERVICE BLUEPRINT)&quot;]
+        direction TB
+
+        subgraph LaneEvidence[&quot;1. BẰNG CHỨNG DỊCH VỤ (Physical / Digital Evidence)&quot;]
+            E1[&quot;Đề bài &amp; Editor&quot;]
+            E2[&quot;Nút Submit &amp; ID&quot;]
+            E3[&quot;Màn hình 'Judging...'&quot;]
+            E4[&quot;Thẻ đỏ WA (14/40)&quot;]
+            E5[&quot;Khung chat hỏi bài&quot;]
+            E6[&quot;Thẻ xanh AC 100/100&quot;]
+        end
+
+        subgraph LaneCustomer[&quot;2. HÀNH ĐỘNG CỦA HỌC VIÊN (Customer Actions)&quot;]
+            C1[&quot;1. Đọc đề &amp; Viết code&quot;]
+            C2[&quot;2. Bấm nút Submit&quot;]
+            C3[&quot;3. Chờ kết quả&quot;]
+            C4[&quot;4. Thấy lỗi WA -&gt; Sửa mò &amp; nộp lại&quot;]
+            C5[&quot;5. Gửi tin nhắn hỏi bài Tutor&quot;]
+            C6[&quot;6. Nhận hướng dẫn -&gt; Sửa code đạt AC&quot;]
+        end
+
+        subgraph LineInteraction[&quot;--------------------------- ĐƯỜNG TƯƠNG TÁC (LINE OF INTERACTION) ---------------------------&quot;]
+        end
+
+        subgraph LaneFrontstage[&quot;3. HÀNH ĐỘNG TIỀN TUYẾN (Onstage / Frontstage Actions)&quot;]
+            FS1[&quot;Tải giao diện bài tập&quot;]
+            FS2[&quot;Tiếp nhận code &amp; validate&quot;]
+            FS3[&quot;Hiển thị trạng thái realtime&quot;]
+            FS4[&quot;Trả về phán quyết WA&quot;]
+            FS5[&quot;Hiển thị tin nhắn trong ca trực&quot;]
+            FS6[&quot;Tutor giải thích lỗi sai &amp; gợi ý&quot;]
+        end
+
+        subgraph LineVisibility[&quot;---------------------------- ĐƯỜNG NHÌN THẤY (LINE OF VISIBILITY) ----------------------------&quot;]
+        end
+
+        subgraph LaneBackstage[&quot;4. HÀNH ĐỘNG HẬU TRƯỜNG (Backstage Actions)&quot;]
+            BS1[&quot;Phân phối bài tập theo tuần&quot;]
+            BS2[&quot;Tạo bản ghi Submission&quot;]
+            BS3[&quot;Điều phối hàng đợi máy chấm&quot;]
+            BS4[&quot;Lưu chi tiết testcase lỗi&quot;]
+            BS5[&quot;Phân công ca trực Tutor&quot;]
+            BS6[&quot;Ghi nhận tiến độ học vụ&quot;]
+        end
+
+        subgraph LineInternal[&quot;--------------------- ĐƯỜNG TƯƠNG TÁC NỘI BỘ (LINE OF INTERNAL INTERACTION) ---------------------&quot;]
+        end
+
+        subgraph LaneSupport[&quot;5. QUÁ TRÌNH HỖ TRỢ (Support Processes)&quot;]
+            SP1[&quot;Academic API &amp; Polygon sync&quot;]
+            SP2[&quot;OJ API lưu DB&quot;]
+            SP3[&quot;DMOJ Sandbox Worker &amp; Bridge&quot;]
+            SP4[&quot;PostgreSQL lưu verdict&quot;]
+            SP5[&quot;Chat WebSocket Server&quot;]
+            SP6[&quot;Academic cập nhật hoàn thành&quot;]
+        end
+    end
+
+    %% Flow connections
+    C1 --&gt; C2 --&gt; C3 --&gt; C4
+    C4 -.-&gt;|Vòng lặp nộp mò R1| C2
+    C4 --&gt; C5 --&gt; C6
+
+    E1 --- C1
+    E2 --- C2
+    E3 --- C3
+    E4 --- C4
+    E5 --- C5
+    E6 --- C6
+
+    C2 &lt;--&gt; FS2
+    C3 &lt;--&gt; FS3
+    C4 &lt;--&gt; FS4
+    C5 &lt;--&gt; FS5
+    C6 &lt;--&gt; FS6
+
+    FS2 &lt;--&gt; BS2
+    FS3 &lt;--&gt; BS3
+    FS4 &lt;--&gt; BS4
+    FS5 &lt;--&gt; BS5
+    FS6 &lt;--&gt; BS6
+
+    BS1 &lt;--&gt; SP1
+    BS2 &lt;--&gt; SP2
+    BS3 &lt;--&gt; SP3
+    BS4 &lt;--&gt; SP4
+    BS5 &lt;--&gt; SP5
+    BS6 &lt;--&gt; SP6
+
+    class E1,E2,E3,E4,E5,E6 evidence;
+    class C1,C2,C3,C4,C5,C6 customer;
+    class FS1,FS2,FS3,FS4,FS5,FS6 frontstage;
+    class BS1,BS2,BS3,BS4,BS5,BS6 backstage;
+    class SP1,SP2,SP3,SP4,SP5,SP6 support;
+</div>
+<hr />
+<h2>5. Chẩn đoán Vấn đề trên Blueprint (Annotations)</h2>
+<p>Trên Blueprint AS-IS, chúng tôi đánh dấu và định danh cụ thể 6 điểm chẩn đoán quan trọng gồm: 2 Failure Points, 2 Waiting Points, 1 Handoff Point, 1 Rework Loop và 1 Service Recovery:</p>
+<div class="mermaid">flowchart LR
+    F1[&quot;[F1] Failure Point:&lt;br&gt;Máy chấm hộp đen WA/TLE&quot;]
+    R1[&quot;[R1] Rework Loop:&lt;br&gt;Học viên sửa mò &amp; nộp lại 5 lần&quot;]
+    W1[&quot;[W1] Waiting Point:&lt;br&gt;Nghẽn hàng đợi DMOJ&quot;]
+    H1[&quot;[H1] Handoff Point:&lt;br&gt;Bàn giao đứt đoạn Máy -&gt; Tutor&quot;]
+    F2[&quot;[F2] Failure Point:&lt;br&gt;Trôi tin nhắn / Mô tả mờ mịt&quot;]
+    W2[&quot;[W2] Waiting Point:&lt;br&gt;Chờ Tutor phản hồi &gt; 45 phút&quot;]
+    SR[&quot;[SR] Service Recovery:&lt;br&gt;Tutor gỡ rối sư phạm cá nhân hóa&quot;]
+
+    F1 --&gt; R1 --&gt; H1 --&gt; F2 --&gt; W2 --&gt; SR
+    W1 -.-&gt; F1
+</div>
+<h3>5.1. Bảng phân tích chi tiết các Annotations chẩn đoán</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Mã ký hiệu</th>
+<th style="text-align: left;">Loại chẩn đoán</th>
+<th style="text-align: left;">Vị trí xuất hiện trên Blueprint</th>
+<th style="text-align: left;">Cơ chế và Biểu hiện thực tế</th>
+<th style="text-align: left;">Hậu quả vận hành và Trải nghiệm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong><code>[F1]</code></strong></td>
+<td style="text-align: left;"><strong>Failure Point</strong> <em>(Điểm nguy cơ lỗi)</em></td>
+<td style="text-align: left;">Bước 4: Tầng Frontstage &amp; Customer Actions khi nhận kết quả <code>WA</code>.</td>
+<td style="text-align: left;"><strong>Máy chấm là "hộp đen" (Black-box service):</strong> Hệ thống chỉ hiển thị mã phán quyết <code>WA 14/40</code> mà không hề đưa ra gợi ý, giải thích biên testcase sai, hoặc hướng dẫn học tập.</td>
+<td style="text-align: left;">Làm học viên mất phương hướng hoàn toàn, không thể tự kích hoạt năng lực debug của bản thân.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong><code>[R1]</code></strong></td>
+<td style="text-align: left;"><strong>Rework Loop</strong> <em>(Vòng lặp sửa sai)</em></td>
+<td style="text-align: left;">Mũi tên quay ngược từ Bước 4 về Bước 2 và Bước 3.</td>
+<td style="text-align: left;"><strong>Vòng lặp sửa mò (Spam Submission Loop):</strong> Học viên thay đổi ngẫu nhiên vài biến/câu lệnh <code>if-else</code> rồi nộp lại liên tiếp từ 4 đến 7 lần trong vòng 10 phút.</td>
+<td style="text-align: left;">Tiêu tốn vô ích tài nguyên máy tính của DMOJ worker; gia tăng tâm lý ức chế cho học viên.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong><code>[W1]</code></strong></td>
+<td style="text-align: left;"><strong>Waiting Point</strong> <em>(Điểm chờ đợi)</em></td>
+<td style="text-align: left;">Bước 3: Tầng Support Process (DMOJ Worker Sandbox).</td>
+<td style="text-align: left;"><strong>Độ trễ hàng đợi máy chấm:</strong> Vào cuối buổi học khi 20 học viên cùng bấm Submit đồng thời, hàng đợi judge bridge bị dồn ứ, thời gian trả kết quả từ 2s tăng vọt lên 30s-45s.</td>
+<td style="text-align: left;">Khiến học viên phải chờ đợi trong sốt ruột, làm gián đoạn dòng suy nghĩ giải thuật.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong><code>[H1]</code></strong></td>
+<td style="text-align: left;"><strong>Handoff Point</strong> <em>(Bàn giao trách nhiệm)</em></td>
+<td style="text-align: left;">Giao điểm giữa Bước 4 và Bước 5: Chuyển giao từ Máy chấm sang Tutor.</td>
+<td style="text-align: left;"><strong>Bàn giao đứt đoạn (Broken Handoff):</strong> Không có luồng dữ liệu tự động nào chuyển trạng thái "Học viên đang nộp trượt 5 lần" từ hệ thống OJ sang cho Tutor. Việc bàn giao phụ thuộc 100% vào việc học viên tự đi kêu cứu thủ công.</td>
+<td style="text-align: left;">Mất mát thông tin ngữ cảnh; Tutor không biết học viên đã thử những cách nào và sai ở đâu.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong><code>[F2]</code></strong></td>
+<td style="text-align: left;"><strong>Failure Point</strong> <em>(Điểm nguy cơ lỗi)</em></td>
+<td style="text-align: left;">Bước 5: Tầng Customer &amp; Frontstage (Kênh hỏi bài).</td>
+<td style="text-align: left;"><strong>Thông tin câu hỏi mờ mịt &amp; trôi tin nhắn:</strong> Học viên hỏi chung chung: <em>"Bài này sai ở đâu ạ"</em> kèm một đống code dài ngoằng; câu hỏi dễ bị trôi nếu có nhiều học viên cùng hỏi trong ca.</td>
+<td style="text-align: left;">Tutor mất rất nhiều thời gian để đọc hiểu lại từ đầu; hoặc trả lời sai lệch trọng tâm do hiểu lầm ý học viên.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong><code>[W2]</code></strong></td>
+<td style="text-align: left;"><strong>Waiting Point</strong> <em>(Điểm chờ đợi)</em></td>
+<td style="text-align: left;">Bước 5: Tầng Frontstage (Chờ Tutor phản hồi).</td>
+<td style="text-align: left;"><strong>Nghẽn công suất phản hồi của Tutor:</strong> Một Tutor phải kèm đồng thời 15-20 học viên; ngoài giờ học chính thức thì không có tutor trực thường trực. Thời gian chờ phản hồi dao động từ 30 phút đến 3-4 tiếng.</td>
+<td style="text-align: left;">Học viên bỏ dở bài tập, tắt máy tính (<em>context switch</em>), dẫn đến tỷ lệ hoàn thành bài tập về nhà sụt giảm mạnh.</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong><code>[SR]</code></strong></td>
+<td style="text-align: left;"><strong>Service Recovery</strong> <em>(Phục hồi dịch vụ)</em></td>
+<td style="text-align: left;">Bước 6: Tầng Frontstage (Tutor gỡ rối sư phạm).</td>
+<td style="text-align: left;"><strong>Can thiệp sư phạm cá nhân hóa:</strong> Tutor phân tích tư duy học viên, không giải hộ mà đặt câu hỏi gợi mở: <em>"Em đã kiểm tra giá trị lớn nhất của $N$ khi nhân lên có vượt quá $2 \times 10^9$ chưa?"</em></td>
+<td style="text-align: left;">Giúp học viên nhận ra lỗi tràn số, phục hồi trải nghiệm tích cực và hoàn thành bài tập thành công.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>6. Liên hệ Chẩn đoán với Bản đồ Tài nguyên – Giá trị (Trace to L2)</h2>
+<p>Một yêu cầu cốt lõi của môn học là chứng minh: <strong>Mọi điểm lỗi, điểm chờ và đứt đoạn trên Service Blueprint đều có nguồn gốc từ cấu hình Actor, Resource hoặc Rule trong Resource–Value Map ở L2</strong>.</p>
+<h3>6.1. Bảng truy vết từ Vấn đề Blueprint về Thành phần L2</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Vấn đề trên Blueprint</th>
+<th style="text-align: left;">Actor liên quan (L2)</th>
+<th style="text-align: left;">Resource liên quan (L2) <em>(Operant vs Operand)</em></th>
+<th style="text-align: left;">Rule / Institution liên quan (L2)</th>
+<th style="text-align: left;">Bản chất đứt gãy Giá trị (S-D Logic)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Vấn đề <code>[F1]</code> &amp; <code>[R1]</code></strong><br><em>(Máy chấm hộp đen &amp; Vòng lặp nộp mò)</em></td>
+<td style="text-align: left;">* <strong>Học viên</strong> <em>(Beneficiary)</em>.<br><em> </em><em>OJ System</em><em> </em>(Provider tool)*.</td>
+<td style="text-align: left;">* <strong>Thiếu Operant:</strong> Học viên thiếu kỹ năng tự sinh test biên; hệ thống thiếu năng lực sư phạm tự động.<br><em> </em><em>Bế tắc Operand:</em>* Testcase Polygon bị khóa kín hoàn toàn (hộp đen).</td>
+<td style="text-align: left;">* <strong>Quy chế bảo mật đề thi:</strong> Áp dụng quy tắc giấu kín testcase của các kỳ thi chính thức vào môi trường đào tạo luyện tập hàng ngày một cách máy móc.</td>
+<td style="text-align: left;">Đề xuất giá trị hứa hẹn "học thực chiến" nhưng công nghệ chỉ cung cấp phán quyết nhị phân, ép học viên vào thế tự xoay sở $\rightarrow$ <strong>Value Destruction</strong>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Vấn đề <code>[W1]</code></strong><br><em>(Nghẽn hàng đợi chấm bài DMOJ)</em></td>
+<td style="text-align: left;">* <strong>Hạ tầng DMOJ Worker</strong>.<br><em> </em><em>Tập thể học viên</em>* nộp bài đồng thời.</td>
+<td style="text-align: left;">* <strong>Giới hạn Operand:</strong> Số lượng CPU core và RAM của 2 Judge Worker bị nghẽn cục bộ khi có đột biến tải nộp bài.</td>
+<td style="text-align: left;">* <strong>Quy chế chấm bài tuần tự:</strong> Không có cơ chế ưu tiên cho bài nộp trong giờ học trực tiếp so với bài tập về nhà.</td>
+<td style="text-align: left;">Sự suy giảm tạm thời của năng lực cung ứng hạ tầng kỹ thuật.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Vấn đề <code>[H1]</code> &amp; <code>[F2]</code></strong><br><em>(Đứt gãy bàn giao &amp; Câu hỏi mờ mịt)</em></td>
+<td style="text-align: left;">* <strong>Học viên</strong>.<br><em> </em><em>Trợ giảng (Tutor)</em>*.</td>
+<td style="text-align: left;">* <strong>Biến thiên Operant đầu vào (theo UST):</strong> Học viên không có kỹ năng cấu trúc hóa câu hỏi.<br><em> </em><em>Thiếu Operand chia sẻ:</em>* Thiếu một bảng dữ liệu chia sẻ chung về "Lịch sử lỗi và diff code" giữa OJ và kênh Chat.</td>
+<td style="text-align: left;">* <strong>Thiếu quy chuẩn hỏi bài:</strong> Trung tâm chưa ban hành mẫu biểu chuẩn (<em>Help Template</em>) bắt buộc học viên phải mô tả ý tưởng trước khi hỏi.</td>
+<td style="text-align: left;">Sự phân mảnh thông tin giữa hai hệ thống con (<code>OJ System</code> và <code>Tutoring System</code> theo mô hình RSS của Cardoso).</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Vấn đề <code>[W2]</code></strong><br><em>(Thời gian chờ Tutor phản hồi quá lâu)</em></td>
+<td style="text-align: left;">* <strong>Trợ giảng (Tutor)</strong>.<br><em> </em><em>Quản lý học vụ</em>*.</td>
+<td style="text-align: left;">* <strong>Giới hạn Operant:</strong> Năng lực xử lý đồng thời của Tutor là hữu hạn (chỉ kèm được 1-1 tối đa 3-4 bạn cùng lúc).<br><em> </em><em>Tài nguyên thời gian:</em>* Quỹ thời gian trực ca của Tutor bị hạn chế.</td>
+<td style="text-align: left;">* <strong>SLA phản hồi $&lt; 15$ phút:</strong> Là quy định trên giấy nhưng thiếu công cụ tự động cảnh báo vi phạm SLA (<em>SLA Breaching Alert</em>) cho ban quản lý.</td>
+<td style="text-align: left;">Kỳ vọng của học viên không được đáp ứng, dẫn đến sự suy giảm trầm trọng của <strong>Value-in-context</strong>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>7. Đề xuất Giả thuyết Cải tiến (TO-BE Hypothesis)</h2>
+<p>Dựa trên việc chẩn đoán các điểm nghẽn và nguyên nhân gốc rễ ở trên, chúng tôi đề xuất một giả thuyết cải tiến (<strong>TO-BE Hypothesis</strong>) cô đọng, tập trung vào việc <strong>thay đổi cơ chế phối hợp (Coordination Mechanism)</strong> và <strong>tái cấu trúc tích hợp tài nguyên</strong>:</p>
+<h3>7.1. Nội dung Giả thuyết Cải tiến (TO-BE Hypothesis)</h3>
+<blockquote>
+<p><strong>"Nếu nền tảng Catplus tích hợp cơ chế Tự động chẩn đoán lỗi cục bộ (Sample Test Inspector &amp; Hint Assistant) ngay trên giao diện khi học viên nộp trượt lần thứ 2, đồng thời tự động kích hoạt vé hỗ trợ kèm đầy đủ bối cảnh mã nguồn (Context-aware Help Ticket) gửi thẳng vào hàng đợi ưu tiên của Tutor khi học viên nộp sai 3 lần liên tiếp, THÌ hệ thống sẽ giảm ít nhất 50% số lần nộp lại thử sai vô vọng (Rework Rate <code>[R1]</code>), xóa bỏ hoàn toàn sự đứt gãy bàn giao (<code>[H1]</code>), và rút ngắn thời gian chờ phản hồi của Tutor (<code>[W2]</code>) xuống dưới 15 phút mà không cần tăng thêm biên chế nhân sự."</strong></p>
+</blockquote>
+<h3>7.2. Giải thích cơ chế kỳ vọng thay đổi (Expected Mechanism Changes)</h3>
+<ol>
+<li><strong>Loại bỏ bước thừa &amp; Tự động hóa (Automate &amp; Eliminate theo L3B):</strong> Thay vì để học viên mò mẫm, hệ thống tự động so sánh output của học viên với output chuẩn trên các test ví dụ mở rộng để chỉ ra chính xác sai sót về định dạng hoặc tràn số $\rightarrow$ giải quyết <code>[F1]</code> và <code>[R1]</code>.</li>
+<li><strong>Chuẩn hóa Handoff (Bridge the Gap):</strong> Vé hỗ trợ tự động đính kèm: mã nguồn mới nhất, danh sách các test bị sai, và lịch sử nộp bài $\rightarrow$ Tutor mở ra là hiểu ngay ngữ cảnh, không mất thời gian hỏi han ban đầu $\rightarrow$ giải quyết <code>[H1]</code> và <code>[F2]</code>.</li>
+<li><strong>Phân phối công suất theo thời gian thực (Smart Dispatching):</strong> Tutor nhận thông báo chủ động (<em>Push Notification</em>) khi học viên rơi vào trạng thái bế tắc, chuyển từ mô hình "chờ học viên kêu cứu" sang "chủ động tiếp cận hỗ trợ đúng lúc" (<em>Just-in-time Mentoring</em>).</li>
+</ol>
+<hr />
+<h2>8. Kết luận và Chuẩn bị cho Mô hình hóa BPMN 2.0 (L3B)</h2>
+<h3>8.1. Kết luận Checkpoint L3A</h3>
+<ul>
+<li>Bản báo cáo đã hoàn thành trọn vẹn việc cụ thể hóa mô hình trừu tượng L2 thành một <strong>Customer Journey Map</strong> và <strong>AS-IS Service Blueprint 5 tầng</strong> trực quan, bám sát nghiệp vụ của nền tảng Catplus.</li>
+<li>Đã định vị chính xác các điểm nghẽn chí mạng trong quy trình: máy chấm hộp đen (<code>[F1]</code>), vòng lặp nộp mò rác (<code>[R1]</code>), bàn giao đứt đoạn (<code>[H1]</code>) và thời gian chờ gia sư kéo dài (<code>[W2]</code>).</li>
+<li>Đã thiết lập giả thuyết cải tiến <strong>TO-BE</strong> với cơ chế thay đổi rõ ràng, làm tiền đề trực tiếp cho bài tập tiếp theo.</li>
+</ul>
+<h3>8.2. Kế hoạch chuyển tiếp sang Checkpoint L3B (BPMN 2.0)</h3>
+<p>Trong bài học L3B, nhóm sẽ lấy chính phạm vi và các phát hiện từ Service Blueprint này để:
+1. <strong>Formalize quy trình bằng chuẩn BPMN 2.0:</strong> Xây dựng mô hình với 2 Pools độc lập (<code>Học viên</code> và <code>Nền tảng Catplus / Tutor</code>), chia Lanes nội bộ, thiết lập các Task, Message Flows, Gateway điều kiện phân nhánh rõ ràng (<code>[Đạt AC]</code>, <code>[Lỗi WA/TLE &lt; 3 lần]</code>, <code>[Lỗi &gt;= 3 lần chuyển vé hỗ trợ]</code>).
+2. <strong>Gắn các Event xử lý ngoại lệ (Boundary Events):</strong> Gắn Timer Boundary Event (nếu Tutor không phản hồi sau 15 phút $\rightarrow$ tự động leo thang thông báo lên Quản lý ca trực).
+3. <strong>Mô hình hóa chi tiết quy trình TO-BE</strong> và phân tích các chỉ số định lượng (<em>Cycle Time, Waiting Time, Failure Rate</em>).</p>
+<hr />
+<h3>Tài liệu tham khảo</h3>
+<ol>
+<li><strong>Bitner, M. J., Ostrom, A. L., &amp; Morgan, F. N. (2008).</strong> <em>Service Blueprinting: A Practical Technique for Service Innovation.</em> California Management Review, 50(3), 66–94.</li>
+<li><strong>Shostack, G. L. (1984).</strong> <em>Designing Services That Deliver.</em> Harvard Business Review, 62(1), 133–139.</li>
+<li><strong>Sampson, S. E. (2001).</strong> <em>Understanding Service Businesses: Applying Principles of the Unified Services Theory.</em> John Wiley &amp; Sons.</li>
+<li><strong>Vargo, S. L., &amp; Lusch, R. F. (2016).</strong> <em>Institutions and axioms: an extension and update of service-dominant logic.</em> Journal of the Academy of Marketing Science, 44(1), 5–23.</li>
+<li><strong>Nguyễn Thị Cẩm Vân (2024–2026).</strong> <em>Bài giảng L3A: Trải nghiệm và Thiết kế Quy trình Dịch vụ.</em> Khoa CNTT, ĐHQGHN.</li>
+</ol>
+</body>
+</html>

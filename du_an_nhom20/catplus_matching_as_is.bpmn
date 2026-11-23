@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+                  id="Definitions_CatPlus_ASIS"
+                  targetNamespace="https://learn.catplus.site/bpmn/as-is">
+
+  <bpmn:collaboration id="Collab_ASIS">
+    <bpmn:participant id="Part_Customer" name="Học viên &amp; Phụ huynh" processRef="Proc_Customer" />
+    <bpmn:participant id="Part_CatPlus" name="Vận hành CatPlus (AS-IS)" processRef="Proc_CatPlus" />
+    <bpmn:participant id="Part_Tutor" name="Gia sư" processRef="Proc_Tutor" />
+
+    <!-- Message Flows between Pools (NO sequenceFlow across pools) -->
+    <bpmn:messageFlow id="Msg_LeadSubmit" name="Đăng ký nhu cầu học" sourceRef="Task_Cust_Register" targetRef="Start_CatPlus" />
+    <bpmn:messageFlow id="Msg_CSKH_Call" name="Gọi tư vấn &amp; hỏi lịch rảnh" sourceRef="Task_CSKH_Consult" targetRef="Catch_Cust_Call" />
+    <bpmn:messageFlow id="Msg_Cust_Reply1" name="Cung cấp 1 khung giờ ưu tiên" sourceRef="Task_Cust_GiveSlot" targetRef="Task_CSKH_Consult" />
+    <bpmn:messageFlow id="Msg_Mgr_AskTutor" name="Nhắn hỏi lịch gia sư (Zalo)" sourceRef="Task_Mgr_ManualSearch" targetRef="Start_Tutor" />
+    <bpmn:messageFlow id="Msg_Tutor_Reply" name="Phản hồi đồng ý / từ chối" sourceRef="Task_Tutor_Reply" targetRef="Catch_Mgr_TutorReply" />
+    <bpmn:messageFlow id="Msg_CSKH_Reask" name="Báo lệch lịch &amp; xin giờ khác" sourceRef="Task_CSKH_Reask" targetRef="Catch_Cust_Reask" />
+    <bpmn:messageFlow id="Msg_Cust_NewSlot" name="Chọn khung giờ khác / Từ chối" sourceRef="Task_Cust_GiveNewSlot" targetRef="Task_CSKH_Reask" />
+    <bpmn:messageFlow id="Msg_Notify_Trial" name="Thông báo lịch học thử / lớp" sourceRef="Task_CSKH_Confirm" targetRef="Catch_Cust_Confirmed" />
+  </bpmn:collaboration>
+
+  <!-- POOL 1: Học viên & Phụ huynh -->
+  <bpmn:process id="Proc_Customer" isExecutable="false">
+    <bpmn:startEvent id="Start_Cust" name="Phát sinh nhu cầu học lập trình" />
+    <bpmn:userTask id="Task_Cust_Register" name="Gửi thông tin đăng ký" />
+    <bpmn:intermediateCatchEvent id="Catch_Cust_Call" name="Nhận cuộc gọi CSKH">
+      <bpmn:messageEventDefinition id="MsgDef_CustCall" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="Task_Cust_GiveSlot" name="Cung cấp mục tiêu &amp; 1 khung giờ" />
+    <bpmn:intermediateCatchEvent id="Catch_Cust_Reask" name="Nhận báo lệch lịch">
+      <bpmn:messageEventDefinition id="MsgDef_CustReask" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="Task_Cust_GiveNewSlot" name="Đề xuất lịch khác hoặc hủy" />
+    <bpmn:intermediateCatchEvent id="Catch_Cust_Confirmed" name="Nhận lịch học chính thức">
+      <bpmn:messageEventDefinition id="MsgDef_CustConf" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:endEvent id="End_Cust" name="Bắt đầu học / Dừng đăng ký" />
+
+    <bpmn:sequenceFlow id="SF_C1" sourceRef="Start_Cust" targetRef="Task_Cust_Register" />
+    <bpmn:sequenceFlow id="SF_C2" sourceRef="Task_Cust_Register" targetRef="Catch_Cust_Call" />
+    <bpmn:sequenceFlow id="SF_C3" sourceRef="Catch_Cust_Call" targetRef="Task_Cust_GiveSlot" />
+    <bpmn:sequenceFlow id="SF_C4" sourceRef="Task_Cust_GiveSlot" targetRef="Catch_Cust_Reask" />
+    <bpmn:sequenceFlow id="SF_C5" sourceRef="Catch_Cust_Reask" targetRef="Task_Cust_GiveNewSlot" />
+    <bpmn:sequenceFlow id="SF_C6" sourceRef="Task_Cust_GiveNewSlot" targetRef="Catch_Cust_Confirmed" />
+    <bpmn:sequenceFlow id="SF_C7" sourceRef="Catch_Cust_Confirmed" targetRef="End_Cust" />
+  </bpmn:process>
+
+  <!-- POOL 2: Vận hành CatPlus -->
+  <bpmn:process id="Proc_CatPlus" isExecutable="false">
+    <bpmn:laneSet id="LaneSet_CatPlus">
+      <bpmn:lane id="Lane_CSKH" name="Chăm sóc khách hàng (CSKH)">
+        <bpmn:flowNodeRef>Start_CatPlus</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CSKH_Consult</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Boundary_CSKH_Timeout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CSKH_Reask</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_CustAgree</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_CSKH_Confirm</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_ClosedLost</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Manager" name="Quản lý học vụ">
+        <bpmn:flowNodeRef>Task_Mgr_ManualSearch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Catch_Mgr_TutorReply</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Boundary_Tutor_Timeout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_MatchSuccess</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>GW_RetryLimit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Mgr_CreateClass</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_System" name="Hệ thống CatPlus (DB)">
+        <bpmn:flowNodeRef>Task_Sys_CreateJourney</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_UpdateEnrolled</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Task_Sys_UpdateLost</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Enrolled</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+
+    <!-- CSKH Nodes -->
+    <bpmn:startEvent id="Start_CatPlus" name="Nhận hồ sơ mới (CHUA_LIEN_HE)">
+      <bpmn:messageEventDefinition id="MsgDef_StartCP" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_CSKH_Consult" name="Tư vấn &amp; lấy 1 khung giờ ưu tiên" />
+    <bpmn:boundaryEvent id="Boundary_CSKH_Timeout" name="Không liên hệ được (24h)" attachedToRef="Task_CSKH_Consult" cancelActivity="true">
+      <bpmn:timerEventDefinition id="Timer_CSKH" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="Task_CSKH_Reask" name="Liên hệ lại phụ huynh xin lịch mới" />
+    <bpmn:exclusiveGateway id="GW_CustAgree" name="Phụ huynh đồng ý đổi giờ?" />
+    <bpmn:userTask id="Task_CSKH_Confirm" name="Xác nhận lịch học thử / vào lớp" />
+    <bpmn:endEvent id="End_ClosedLost" name="Đóng hồ sơ (CLOSED_LOST)" />
+
+    <!-- Manager Nodes -->
+    <bpmn:userTask id="Task_Mgr_ManualSearch" name="Dò lịch thủ công &amp; nhắn hỏi gia sư" />
+    <bpmn:intermediateCatchEvent id="Catch_Mgr_TutorReply" name="Chờ gia sư phản hồi">
+      <bpmn:messageEventDefinition id="MsgDef_TutorRep" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:boundaryEvent id="Boundary_Tutor_Timeout" name="Quá hạn phản hồi (8h)" attachedToRef="Catch_Mgr_TutorReply" cancelActivity="true">
+      <bpmn:timerEventDefinition id="Timer_Tutor" />
+    </bpmn:boundaryEvent>
+    <bpmn:exclusiveGateway id="GW_MatchSuccess" name="Khớp gia sư &amp; lịch?" />
+    <bpmn:exclusiveGateway id="GW_RetryLimit" name="Đã thử &gt;= 2 vòng?" />
+    <bpmn:userTask id="Task_Mgr_CreateClass" name="Tạo TrialSession / Class trên web" />
+
+    <!-- System Nodes -->
+    <bpmn:serviceTask id="Task_Sys_CreateJourney" name="Ghi nhận Student (PENDING) &amp; Journey" />
+    <bpmn:serviceTask id="Task_Sys_UpdateEnrolled" name="Cập nhật ENROLLED (DA_THAM_GIA)" />
+    <bpmn:serviceTask id="Task_Sys_UpdateLost" name="Ghi CLOSED_LOST (SCHEDULE_MISMATCH)" />
+    <bpmn:endEvent id="End_Enrolled" name="Nhập học thành công" />
+
+    <!-- Sequence Flows inside Pool 2 -->
+    <bpmn:sequenceFlow id="SF_1" sourceRef="Start_CatPlus" targetRef="Task_Sys_CreateJourney" />
+    <bpmn:sequenceFlow id="SF_2" sourceRef="Task_Sys_CreateJourney" targetRef="Task_CSKH_Consult" />
+    <bpmn:sequenceFlow id="SF_3" sourceRef="Task_CSKH_Consult" targetRef="Task_Mgr_ManualSearch" />
+    <bpmn:sequenceFlow id="SF_Timeout1" name="Quá hạn" sourceRef="Boundary_CSKH_Timeout" targetRef="Task_Sys_UpdateLost" />
+    <bpmn:sequenceFlow id="SF_4" sourceRef="Task_Mgr_ManualSearch" targetRef="Catch_Mgr_TutorReply" />
+    <bpmn:sequenceFlow id="SF_5" sourceRef="Catch_Mgr_TutorReply" targetRef="GW_MatchSuccess" />
+    <bpmn:sequenceFlow id="SF_Timeout2" name="Gia sư trễ" sourceRef="Boundary_Tutor_Timeout" targetRef="GW_RetryLimit" />
+    <bpmn:sequenceFlow id="SF_MatchYes" name="Có (Khớp)" sourceRef="GW_MatchSuccess" targetRef="Task_Mgr_CreateClass" />
+    <bpmn:sequenceFlow id="SF_MatchNo" name="Không khớp" sourceRef="GW_MatchSuccess" targetRef="GW_RetryLimit" />
+    <bpmn:sequenceFlow id="SF_RetryNo" name="Chưa (&lt; 2 vòng)" sourceRef="GW_RetryLimit" targetRef="Task_CSKH_Reask" />
+    <bpmn:sequenceFlow id="SF_RetryYes" name="Quá 2 vòng" sourceRef="GW_RetryLimit" targetRef="Task_Sys_UpdateLost" />
+    <bpmn:sequenceFlow id="SF_6" sourceRef="Task_CSKH_Reask" targetRef="GW_CustAgree" />
+    <bpmn:sequenceFlow id="SF_AgreeYes" name="Có lịch mới" sourceRef="GW_CustAgree" targetRef="Task_Mgr_ManualSearch" />
+    <bpmn:sequenceFlow id="SF_AgreeNo" name="Hủy học" sourceRef="GW_CustAgree" targetRef="Task_Sys_UpdateLost" />
+    <bpmn:sequenceFlow id="SF_7" sourceRef="Task_Mgr_CreateClass" targetRef="Task_Sys_UpdateEnrolled" />
+    <bpmn:sequenceFlow id="SF_8" sourceRef="Task_Sys_UpdateEnrolled" targetRef="Task_CSKH_Confirm" />
+    <bpmn:sequenceFlow id="SF_9" sourceRef="Task_CSKH_Confirm" targetRef="End_Enrolled" />
+    <bpmn:sequenceFlow id="SF_LostEnd" sourceRef="Task_Sys_UpdateLost" targetRef="End_ClosedLost" />
+
+    <!-- Direct Annotations per L3B P46 -->
+    <bpmn:textAnnotation id="Anno_Bottleneck">
+      <bpmn:text>[Bottleneck &amp; Handoff] Quản lý dò tay tuần tự từng ca, dễ sót phương án tối ưu</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_1" sourceRef="Task_Mgr_ManualSearch" targetRef="Anno_Bottleneck" />
+
+    <bpmn:textAnnotation id="Anno_Waiting">
+      <bpmn:text>[Waiting &amp; Rework] Độ trễ chờ phản hồi gia sư &amp; vòng lặp hỏi lại phụ huynh</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_2" sourceRef="Catch_Mgr_TutorReply" targetRef="Anno_Waiting" />
+
+    <bpmn:textAnnotation id="Anno_Failure">
+      <bpmn:text>[Failure] Rớt SCHEDULE_MISMATCH / CENTER_CANNOT_SERVE</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Assoc_3" sourceRef="Task_Sys_UpdateLost" targetRef="Anno_Failure" />
+  </bpmn:process>
+
+  <!-- POOL 3: Gia sư -->
+  <bpmn:process id="Proc_Tutor" isExecutable="false">
+    <bpmn:startEvent id="Start_Tutor" name="Nhận tin nhắn hỏi lịch từ Quản lý">
+      <bpmn:messageEventDefinition id="MsgDef_TutorStart" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Task_Tutor_Check" name="Kiểm tra lịch rảnh cá nhân" />
+    <bpmn:userTask id="Task_Tutor_Reply" name="Phản hồi nhận / từ chối lớp" />
+    <bpmn:endEvent id="End_Tutor" name="Hoàn tất xác nhận lịch" />
+
+    <bpmn:sequenceFlow id="SF_T1" sourceRef="Start_Tutor" targetRef="Task_Tutor_Check" />
+    <bpmn:sequenceFlow id="SF_T2" sourceRef="Task_Tutor_Check" targetRef="Task_Tutor_Reply" />
+    <bpmn:sequenceFlow id="SF_T3" sourceRef="Task_Tutor_Reply" targetRef="End_Tutor" />
+  </bpmn:process>
+
+  <!-- BPMN DIAGRAM LAYOUT -->
+  <bpmndi:BPMNDiagram id="Diagram_ASIS">
+    <bpmndi:BPMNPlane id="Plane_ASIS" bpmnElement="Collab_ASIS">
+      <!-- Pools -->
+      <bpmndi:BPMNShape id="DI_Part_Customer" bpmnElement="Part_Customer" isHorizontal="true">
+        <dc:Bounds x="100" y="50" width="1220" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Part_CatPlus" bpmnElement="Part_CatPlus" isHorizontal="true">
+        <dc:Bounds x="100" y="220" width="1220" height="490" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Lane_CSKH" bpmnElement="Lane_CSKH" isHorizontal="true">
+        <dc:Bounds x="130" y="220" width="1190" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Lane_Manager" bpmnElement="Lane_Manager" isHorizontal="true">
+        <dc:Bounds x="130" y="380" width="1190" height="175" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Lane_System" bpmnElement="Lane_System" isHorizontal="true">
+        <dc:Bounds x="130" y="555" width="1190" height="155" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Part_Tutor" bpmnElement="Part_Tutor" isHorizontal="true">
+        <dc:Bounds x="100" y="730" width="1220" height="140" />
+      </bpmndi:BPMNShape>
+
+      <!-- Customer Shapes -->
+      <bpmndi:BPMNShape id="DI_Start_Cust" bpmnElement="Start_Cust">
+        <dc:Bounds x="160" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Cust_Reg" bpmnElement="Task_Cust_Register">
+        <dc:Bounds x="230" y="85" width="130" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Catch_Cust_Call" bpmnElement="Catch_Cust_Call">
+        <dc:Bounds x="400" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Cust_GiveSlot" bpmnElement="Task_Cust_GiveSlot">
+        <dc:Bounds x="470" y="85" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Catch_Cust_Reask" bpmnElement="Catch_Cust_Reask">
+        <dc:Bounds x="680" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Cust_GiveNewSlot" bpmnElement="Task_Cust_GiveNewSlot">
+        <dc:Bounds x="750" y="85" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Catch_Cust_Confirmed" bpmnElement="Catch_Cust_Confirmed">
+        <dc:Bounds x="1040" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_End_Cust" bpmnElement="End_Cust">
+        <dc:Bounds x="1150" y="107" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- CatPlus Shapes -->
+      <bpmndi:BPMNShape id="DI_Start_CatPlus" bpmnElement="Start_CatPlus">
+        <dc:Bounds x="180" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Sys_CreateJourney" bpmnElement="Task_Sys_CreateJourney">
+        <dc:Bounds x="240" y="595" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_CSKH_Consult" bpmnElement="Task_CSKH_Consult">
+        <dc:Bounds x="420" y="260" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Boundary_CSKH_Timeout" bpmnElement="Boundary_CSKH_Timeout">
+        <dc:Bounds x="520" y="322" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Mgr_ManualSearch" bpmnElement="Task_Mgr_ManualSearch">
+        <dc:Bounds x="420" y="425" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Catch_Mgr_TutorReply" bpmnElement="Catch_Mgr_TutorReply">
+        <dc:Bounds x="615" y="447" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Boundary_Tutor_Timeout" bpmnElement="Boundary_Tutor_Timeout">
+        <dc:Bounds x="625" y="470" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_GW_MatchSuccess" bpmnElement="GW_MatchSuccess" isMarkerVisible="true">
+        <dc:Bounds x="710" y="440" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_GW_RetryLimit" bpmnElement="GW_RetryLimit" isMarkerVisible="true">
+        <dc:Bounds x="710" y="500" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_CSKH_Reask" bpmnElement="Task_CSKH_Reask">
+        <dc:Bounds x="670" y="260" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_GW_CustAgree" bpmnElement="GW_CustAgree" isMarkerVisible="true">
+        <dc:Bounds x="850" y="275" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Mgr_CreateClass" bpmnElement="Task_Mgr_CreateClass">
+        <dc:Bounds x="880" y="425" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Sys_UpdateEnrolled" bpmnElement="Task_Sys_UpdateEnrolled">
+        <dc:Bounds x="880" y="595" width="150" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_CSKH_Confirm" bpmnElement="Task_CSKH_Confirm">
+        <dc:Bounds x="1030" y="260" width="150" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_End_Enrolled" bpmnElement="End_Enrolled">
+        <dc:Bounds x="1220" y="614" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Sys_UpdateLost" bpmnElement="Task_Sys_UpdateLost">
+        <dc:Bounds x="1060" y="595" width="140" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_End_ClosedLost" bpmnElement="End_ClosedLost">
+        <dc:Bounds x="1220" y="282" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- Annotations -->
+      <bpmndi:BPMNShape id="DI_Anno_Bottleneck" bpmnElement="Anno_Bottleneck">
+        <dc:Bounds x="190" y="420" width="190" height="55" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Anno_Waiting" bpmnElement="Anno_Waiting">
+        <dc:Bounds x="550" y="388" width="170" height="45" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Anno_Failure" bpmnElement="Anno_Failure">
+        <dc:Bounds x="1060" y="490" width="180" height="45" />
+      </bpmndi:BPMNShape>
+
+      <!-- Tutor Shapes -->
+      <bpmndi:BPMNShape id="DI_Start_Tutor" bpmnElement="Start_Tutor">
+        <dc:Bounds x="430" y="782" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Tutor_Check" bpmnElement="Task_Tutor_Check">
+        <dc:Bounds x="500" y="760" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_Task_Tutor_Reply" bpmnElement="Task_Tutor_Reply">
+        <dc:Bounds x="680" y="760" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DI_End_Tutor" bpmnElement="End_Tutor">
+        <dc:Bounds x="860" y="782" width="36" height="36" />
+      </bpmndi:BPMNShape>
+
+      <!-- Edges: Customer -->
+      <bpmndi:BPMNEdge id="DI_SF_C1" bpmnElement="SF_C1"><di:waypoint x="196" y="125" /><di:waypoint x="230" y="125" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_C2" bpmnElement="SF_C2"><di:waypoint x="360" y="125" /><di:waypoint x="400" y="125" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_C3" bpmnElement="SF_C3"><di:waypoint x="436" y="125" /><di:waypoint x="470" y="125" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_C4" bpmnElement="SF_C4"><di:waypoint x="610" y="125" /><di:waypoint x="680" y="125" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_C5" bpmnElement="SF_C5"><di:waypoint x="716" y="125" /><di:waypoint x="750" y="125" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_C6" bpmnElement="SF_C6"><di:waypoint x="890" y="125" /><di:waypoint x="1040" y="125" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_C7" bpmnElement="SF_C7"><di:waypoint x="1076" y="125" /><di:waypoint x="1150" y="125" /></bpmndi:BPMNEdge>
+
+      <!-- Edges: CatPlus -->
+      <bpmndi:BPMNEdge id="DI_SF_1" bpmnElement="SF_1"><di:waypoint x="198" y="318" /><di:waypoint x="198" y="632" /><di:waypoint x="240" y="632" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_2" bpmnElement="SF_2"><di:waypoint x="390" y="632" /><di:waypoint x="405" y="632" /><di:waypoint x="405" y="300" /><di:waypoint x="420" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_3" bpmnElement="SF_3"><di:waypoint x="495" y="340" /><di:waypoint x="495" y="425" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_Timeout1" bpmnElement="SF_Timeout1"><di:waypoint x="538" y="358" /><di:waypoint x="538" y="685" /><di:waypoint x="1130" y="685" /><di:waypoint x="1130" y="670" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_4" bpmnElement="SF_4"><di:waypoint x="570" y="465" /><di:waypoint x="615" y="465" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_5" bpmnElement="SF_5"><di:waypoint x="651" y="465" /><di:waypoint x="710" y="465" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_Timeout2" bpmnElement="SF_Timeout2"><di:waypoint x="643" y="506" /><di:waypoint x="643" y="525" /><di:waypoint x="710" y="525" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_MatchYes" bpmnElement="SF_MatchYes"><di:waypoint x="760" y="465" /><di:waypoint x="880" y="465" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_MatchNo" bpmnElement="SF_MatchNo"><di:waypoint x="735" y="490" /><di:waypoint x="735" y="500" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_RetryNo" bpmnElement="SF_RetryNo"><di:waypoint x="710" y="525" /><di:waypoint x="660" y="525" /><di:waypoint x="660" y="300" /><di:waypoint x="670" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_RetryYes" bpmnElement="SF_RetryYes"><di:waypoint x="735" y="550" /><di:waypoint x="735" y="632" /><di:waypoint x="1060" y="632" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_6" bpmnElement="SF_6"><di:waypoint x="810" y="300" /><di:waypoint x="850" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_AgreeYes" bpmnElement="SF_AgreeYes"><di:waypoint x="875" y="325" /><di:waypoint x="875" y="405" /><di:waypoint x="530" y="405" /><di:waypoint x="530" y="425" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_AgreeNo" bpmnElement="SF_AgreeNo"><di:waypoint x="900" y="300" /><di:waypoint x="980" y="300" /><di:waypoint x="980" y="575" /><di:waypoint x="1130" y="575" /><di:waypoint x="1130" y="595" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_7" bpmnElement="SF_7"><di:waypoint x="955" y="505" /><di:waypoint x="955" y="595" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_8" bpmnElement="SF_8"><di:waypoint x="1005" y="595" /><di:waypoint x="1005" y="300" /><di:waypoint x="1030" y="300" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_9" bpmnElement="SF_9"><di:waypoint x="1180" y="300" /><di:waypoint x="1200" y="300" /><di:waypoint x="1200" y="632" /><di:waypoint x="1220" y="632" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_LostEnd" bpmnElement="SF_LostEnd"><di:waypoint x="1200" y="632" /><di:waypoint x="1238" y="632" /><di:waypoint x="1238" y="318" /></bpmndi:BPMNEdge>
+
+      <!-- Associations -->
+      <bpmndi:BPMNEdge id="DI_Assoc_1" bpmnElement="Assoc_1"><di:waypoint x="420" y="455" /><di:waypoint x="380" y="450" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Assoc_2" bpmnElement="Assoc_2"><di:waypoint x="633" y="447" /><di:waypoint x="633" y="433" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Assoc_3" bpmnElement="Assoc_3"><di:waypoint x="1130" y="595" /><di:waypoint x="1140" y="535" /></bpmndi:BPMNEdge>
+
+      <!-- Tutor Edges -->
+      <bpmndi:BPMNEdge id="DI_SF_T1" bpmnElement="SF_T1"><di:waypoint x="466" y="800" /><di:waypoint x="500" y="800" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_T2" bpmnElement="SF_T2"><di:waypoint x="640" y="800" /><di:waypoint x="680" y="800" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_SF_T3" bpmnElement="SF_T3"><di:waypoint x="820" y="800" /><di:waypoint x="860" y="800" /></bpmndi:BPMNEdge>
+
+      <!-- Message Flow Edges -->
+      <bpmndi:BPMNEdge id="DI_Msg_LeadSubmit" bpmnElement="Msg_LeadSubmit"><di:waypoint x="295" y="165" /><di:waypoint x="295" y="210" /><di:waypoint x="198" y="210" /><di:waypoint x="198" y="282" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Msg_CSKH_Call" bpmnElement="Msg_CSKH_Call"><di:waypoint x="450" y="260" /><di:waypoint x="450" y="200" /><di:waypoint x="418" y="200" /><di:waypoint x="418" y="143" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Msg_Cust_Reply1" bpmnElement="Msg_Cust_Reply1"><di:waypoint x="540" y="165" /><di:waypoint x="540" y="260" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Msg_Mgr_AskTutor" bpmnElement="Msg_Mgr_AskTutor"><di:waypoint x="448" y="505" /><di:waypoint x="448" y="782" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Msg_Tutor_Reply" bpmnElement="Msg_Tutor_Reply"><di:waypoint x="750" y="760" /><di:waypoint x="750" y="700" /><di:waypoint x="633" y="700" /><di:waypoint x="633" y="483" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Msg_CSKH_Reask" bpmnElement="Msg_CSKH_Reask"><di:waypoint x="710" y="260" /><di:waypoint x="710" y="200" /><di:waypoint x="698" y="200" /><di:waypoint x="698" y="143" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Msg_Cust_NewSlot" bpmnElement="Msg_Cust_NewSlot"><di:waypoint x="780" y="165" /><di:waypoint x="780" y="260" /></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DI_Msg_Notify_Trial" bpmnElement="Msg_Notify_Trial"><di:waypoint x="1105" y="260" /><di:waypoint x="1105" y="200" /><di:waypoint x="1058" y="200" /><di:waypoint x="1058" y="143" /></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
