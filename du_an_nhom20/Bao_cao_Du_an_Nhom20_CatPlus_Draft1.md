@@ -1,337 +1,477 @@
-# BÁO CÁO DỰ ÁN NHÓM — HỌC PHẦN KHOA HỌC DỊCH VỤ (INT3501)
+# BÁO CÁO DỰ ÁN CUỐI KỲ — HỌC PHẦN KHOA HỌC DỊCH VỤ (INT3501)
 
-## TỐI ƯU HÓA QUY TRÌNH GHÉP ĐÔI GIA SƯ – HỌC VIÊN VÀ XẾP LỊCH HỌC TRONG HỆ THỐNG DỊCH VỤ ĐÀO TẠO LẬP TRÌNH CATPLUS
+**ĐẠI HỌC QUỐC GIA HÀ NỘI — TRƯỜNG ĐẠI HỌC CÔNG NGHỆ**
 
-- **Nhóm thực hiện:** Nhóm 20
-  - Phoutthavong Xayavong — MSV: 23021941
-  - Vũ Quốc Long — MSV: [Điền MSV]
-- **Ba chỉ số trọng tâm theo góp ý của Giảng viên:** Tỷ lệ ghép thành công, độ phù hợp lịch, thời gian chờ học viên.
-- **Khung phân tích chủ đạo:** Mô hình Hệ thống làm việc (Work System Framework), kết hợp góc nhìn Đồng tạo giá trị (SDL) và Đầu vào từ phía khách hàng (UST).
-- **Hướng giải quyết chính:** Giữ nguyên sự tư vấn tận tâm của đội ngũ nhân sự, bổ sung công cụ gợi ý xếp lịch và gom nhóm tự động để hỗ trợ Quản lý ra quyết định nhanh hơn.
+## TỐI ƯU HÓA QUY TRÌNH GHÉP ĐÔI GIA SƯ – HỌC VIÊN VÀ XẾP LỊCH HỌC TRÊN NỀN TẢNG CATPLUS
 
----
+*So sánh phương án xếp lịch thủ công cơ sở (AS-IS) và quy hoạch nguyên gom nhóm (MILP), kết hợp mô phỏng hàng đợi SimPy, trên hệ thống dịch vụ đào tạo lập trình CatPlus*
 
-## 1. BÀI TOÁN VÀ PHẠM VI
-
-### 1.1. Câu chuyện thực tế tại CatPlus và vấn đề đang gặp phải
-Ai từng vận hành một trung tâm đào tạo hay nền tảng học trực tuyến có gia sư kèm đều gặp một bài toán rất quen thuộc: tìm được học sinh đăng ký đã khó, nhưng **xếp được lịch khớp giữa học sinh, phụ huynh và gia sư để lớp thực sự khai giảng** còn vất vả hơn nhiều.
-
-Tại **CatPlus** (https://learn.catplus.site/) — nền tảng đào tạo lập trình thi đấu cho học sinh cấp 2 (THCS) và cấp 3 (THPT) — yếu tố con người luôn được đặt lên hàng đầu. Học sinh không chỉ lên web tự xem video mà học trực tiếp cùng gia sư theo hai hình thức: **lớp kèm riêng 1–1** hoặc **lớp nhóm nhỏ từ 3 đến 5 học viên** cùng trình độ. Quy định của trung tâm rất rõ ràng: lớp kèm riêng thì chỉ cần 1 thầy 1 trò là học được ngay, nhưng lớp nhóm thì bắt buộc phải gom đủ từ 3 đến 5 em cùng cấp học và cùng rảnh một khung giờ thì mới mở lớp được (nếu chỉ có 1–2 em thì chưa đủ chi phí vận hành lớp nhóm).
-
-Hiện nay, dù CatPlus đã có phần mềm để lưu danh sách học sinh và lịch dạy, nhưng **toàn bộ khâu hỏi lịch, tìm gia sư và gom nhóm vẫn đang làm thủ công**:
-1. Khi phụ huynh đăng ký, bạn Chăm sóc khách hàng (CSKH) gọi điện tư vấn lộ trình, hỏi mục tiêu học tập và thường chỉ hỏi **một khung giờ mà gia đình muốn học nhất**.
-2. Bạn Quản lý học vụ nhận thông tin đó, mở danh sách gia sư ra dò bằng mắt theo kiểu hồ sơ nào đến trước thì xếp trước. Với lớp 1–1, Quản lý nhắn Zalo hỏi từng gia sư xem ai nhận được. Với lớp nhóm, Quản lý ghi nhận tạm để chờ gom thêm học sinh khác có cùng khung giờ.
-3. Nếu gia sư báo bận, hoặc chờ mãi mà khung giờ đó chỉ gom được 1–2 học sinh (chưa đủ 3 em để mở lớp nhóm), Quản lý lại báo ngược về cho CSKH để gọi điện thuyết phục phụ huynh đổi sang buổi khác. Chỉ khi nào các bên chốt xong xuôi ở ngoài, Quản lý mới nhập lịch chính thức lên hệ thống.
-
-Cách làm thủ công này rất linh hoạt khi trung tâm còn ít học viên, nhưng khi lượng đăng ký tăng lên (khoảng 60 học viên mới mỗi tháng), ba điểm nghẽn lớn bắt đầu xuất hiện đúng như những gì giảng viên đã chỉ ra:
-
-- **Học viên bị rớt đáng tiếc vì lớp nhóm bị xé lẻ:** Một tuần có khoảng 14 khung giờ học phổ biến (các buổi tối trong tuần và ngày cuối tuần), nhân với 2 cấp học (THCS và THPT) là thành 28 tổ hợp khác nhau. Khi CSKH chỉ hỏi mỗi gia đình 1 khung giờ thích nhất, 35–40 học sinh đăng ký học nhóm bị rải mỏng ra khắp 28 tổ hợp này. Rất nhiều khung giờ chỉ có 1 hoặc 2 em đăng ký, không đủ ngưỡng tối thiểu 3 học viên để mở lớp, dẫn đến học viên phải bỏ cuộc dù trung tâm vẫn còn gia sư rảnh.
-- **Lãng phí gia sư dạy giỏi vào các ca dễ:** Trong đội ngũ có những gia sư dạy được cả cấp 2 lẫn cấp 3, lại rảnh vào các khung giờ "vàng". Vì xếp theo thứ tự ai đến trước xếp trước, Quản lý dễ gán ngay các gia sư này cho những học sinh đầu tiên có lịch khá thoải mái. Đến khi học sinh có lịch học hẹp (chỉ rảnh đúng 1 buổi cuối tuần) đăng ký sau thì không còn gia sư phù hợp nữa.
-- **Thời gian chờ đợi kéo dài vì phải hỏi đi hỏi lại:** Mỗi lần lệch lịch là thông tin phải đi một vòng từ Quản lý sang Zalo gia sư, quay về CSKH, rồi lại gọi cho phụ huynh. Chờ gia sư trả lời mất vài tiếng, chờ phụ huynh bàn với con mất thêm nửa ngày, khiến một hồ sơ mất trung bình gần 3 ngày làm việc mới chốt xong.
-
-### 1.2. Ai được phục vụ và phạm vi phân tích nằm ở đâu?
-Để bài phân tích tập trung và rõ ràng, nhóm đóng khung phạm vi quy trình qua 8 câu hỏi cơ bản của môn học:
-
-| Nội dung xác định | Thực tế áp dụng tại CatPlus |
-| :--- | :--- |
-| **1. Đơn vị quy trình phân tích** | Hành trình xử lý **01 hồ sơ học viên mới** từ lúc đăng ký đến khi chốt xong lịch học (hoặc dừng hồ sơ). |
-| **2. Người thụ hưởng chính** | **Học viên** (cần lớp học đúng trình độ, sớm bắt đầu) và **Phụ huynh** (cần được tư vấn gọn gàng, không phải đổi lịch nhiều lần). |
-| **3. Đội ngũ tham gia cung cấp** | Nhân viên **CSKH** (tư vấn, cầu nối thông tin), **Quản lý học vụ** (xếp lớp, điều phối gia sư), **Gia sư** và **Phần mềm CatPlus**. |
-| **4. Điểm bắt đầu quy trình** | Phụ huynh/học viên để lại thông tin đăng ký, hệ thống tạo hồ sơ mới ở trạng thái *Chưa liên hệ*. |
-| **5. Kết quả thành công mong đợi** | Học viên được xếp vào lớp 1–1 hoặc lớp nhóm (đủ 3–5 em) đúng cấp học, có lịch học thử và vào học chính thức. |
-| **6. Trường hợp kết thúc thất bại** | Hồ sơ bị đóng do không khớp được lịch, trung tâm không gom đủ nhóm 3 học viên, hoặc không liên hệ được phụ huynh. |
-| **7. Những việc nằm trong phạm vi** | Toàn bộ các bước: Tiếp nhận đăng ký → Tư vấn hỏi lịch → Tìm gia sư và gom nhóm → Hỏi xác nhận gia sư → Báo lịch chốt cho phụ huynh. |
-| **8. Những việc nằm ngoài phạm vi** | Việc học viên làm bài tập và chấm code tự động sau khi đã vào học, việc biên soạn đề thi, cũng như khâu thu học phí và tính lương. |
-
-### 1.3. Ba câu hỏi nghiên cứu và cách tính 3 chỉ số đo lường (KPIs)
-Mọi so sánh giữa cách làm hiện tại (xếp tay) và phương án cải tiến trong báo cáo này đều được đo bằng 3 chỉ số cụ thể, dễ kiểm tra:
-
-**Chỉ số 1 — Tỷ lệ ghép lớp thành công (đơn vị: %)**
-Cho biết trong 100 học viên đăng ký thì trung tâm xếp được lớp cho bao nhiêu em:
-> **Công thức tính:**
-> **Tỷ lệ ghép thành công (%) = (Số học viên xếp được lớp ÷ Tổng số học viên đăng ký) × 100%**
-> *(Ví dụ: Có 60 học viên đăng ký, xếp được lớp cho 54 em và 6 em phải hủy do lệch lịch thì tỷ lệ ghép thành công là 54 ÷ 60 × 100% = 90%).*
-
-**Chỉ số 2 — Điểm độ phù hợp lịch học (thang điểm 100)**
-Đo mức độ hài lòng của học viên đối với khung giờ được xếp. Quy ước: xếp đúng khung giờ ưu tiên số 1 được **100 điểm**; khung giờ ưu tiên số 2 được **80 điểm**; khung giờ ưu tiên số 3 được **60 điểm**; nếu không xếp được lớp thì tính **0 điểm**. Nhóm theo dõi cả hai con số:
-> **Công thức tính:**
-> - **Độ phù hợp lịch của nhóm đã vào lớp = Tổng điểm phù hợp của các học viên được xếp lớp ÷ Số học viên được xếp lớp**
-> - **Độ phù hợp lịch tính trên toàn bộ khách đăng ký = Tổng điểm phù hợp của tất cả học viên ÷ Tổng số học viên đăng ký**
-
-**Chỉ số 3 — Thời gian chờ của học viên (đơn vị: giờ làm việc, quy ước 8 giờ làm việc = 1 ngày)**
-Đo tổng thời gian từ lúc hồ sơ mới tạo cho đến khi phụ huynh nhận được lịch học chính thức:
-> **Công thức tính:**
-> **Thời gian chờ của 1 học viên (W) = Thời điểm chốt xong lịch học − Thời điểm gửi đăng ký**
-> **Thời gian chờ trung bình = Tổng thời gian chờ của các học viên ÷ Tổng số học viên**
-> *(Ngoài số trung bình, nhóm đo thêm mức **Phân vị 90% (P90)** — tức là mốc thời gian mà 90% học viên được giải quyết xong, và **Tỷ lệ hồ sơ hoàn thành trong vòng 2 ngày làm việc (≤ 16 giờ)**).*
+- **Nhóm 20** — Sinh viên thực hiện:
+  - `23021941` — Phoutthavong Xayavong
+  - `[Điền MSV]` — Vũ Quốc Long
+- **Địa điểm, thời gian:** Hà Nội, 2026
 
 ---
 
-## 2. MÔ HÌNH HỆ THỐNG DỊCH VỤ
+## Mục lục
 
-### 2.1. Vì sao chọn Mô hình Hệ thống làm việc (Work System Framework)?
-Theo hướng dẫn của môn học (mỗi nhóm chọn **một khung lý thuyết chính** xuyên suốt), nhóm sử dụng **Mô hình Hệ thống làm việc (Work System Framework)**. Khung này rất hợp với thực tế của CatPlus vì nó không nhìn dịch vụ như một phần mềm thuần túy, mà đặt **Con người – Quy trình làm việc – Thông tin – Công nghệ** lên cùng một bàn cân.
+<!-- TOC_START -->
+- **1 Bối cảnh và câu hỏi phân tích** *(trang 1)*
+  - 1.1 Vấn đề dịch vụ *(trang 1)*
+  - 1.2 Phạm vi và câu hỏi phân tích *(trang 1)*
+  - 1.3 Dữ liệu và chỉ số *(trang 2)*
+  - 1.4 Cách tiếp cận *(trang 2)*
+- **2 Hệ thống dịch vụ đào tạo lập trình CatPlus** *(trang 3)*
+  - 2.1 Mô tả hệ thống bằng Work System Framework *(trang 3)*
+  - 2.2 Bản đồ nguồn lực và đồng tạo giá trị *(trang 4)*
+- **3 Quy trình hiện tại và chẩn đoán** *(trang 5)*
+  - 3.1 Quy trình AS-IS *(trang 5)*
+  - 3.2 Phân tích thời gian theo từng chặng *(trang 5)*
+  - 3.3 Phân tích hàng đợi và tình trạng tồn đọng *(trang 7)*
+- **4 Mô hình tối ưu ghép lớp và xếp lịch** *(trang 7)*
+  - 4.1 Quy mô học viên, gia sư và dữ liệu nhu cầu *(trang 7)*
+  - 4.2 Khung giờ học và hàm điểm phù hợp lịch *(trang 8)*
+  - 4.3 Mô hình phân công ghép đôi và gom nhóm (MILP) *(trang 8)*
+  - 4.4 Giả định và cách kiểm tra *(trang 9)*
+- **5 Triển khai tính toán và kết quả chạy** *(trang 10)*
+  - 5.1 Chuỗi xử lý *(trang 10)*
+  - 5.2 Trích mã nguồn và nhật ký chạy *(trang 11)*
+- **6 Kết quả so sánh các phương án** *(trang 11)*
+  - 6.1 So sánh AS-IS và TO-BE *(trang 11)*
+  - 6.2 Đánh đổi đa mục tiêu và đường biên Pareto *(trang 13)*
+  - 6.3 Độ ổn định và phân tích độ nhạy *(trang 14)*
+- **7 Đề xuất cải tiến (TO-BE)** *(trang 15)*
+  - 7.1 Thay đổi trong quy trình *(trang 15)*
+  - 7.2 Lựa chọn cấu hình và lộ trình triển khai *(trang 16)*
+  - 7.3 Vai trò, nguồn lực và chỉ số theo dõi *(trang 16)*
+  - 7.4 Đánh đổi *(trang 17)*
+- **8 Kết luận** *(trang 17)*
+  - 8.1 Trả lời câu hỏi phân tích *(trang 17)*
+  - 8.2 Giới hạn *(trang 18)*
+  - 8.3 Hướng phát triển *(trang 18)*
+- **Tài liệu tham khảo** *(trang 19)*
+- **Phụ lục: Khai báo minh bạch sử dụng AI** *(trang 20)*
+<!-- TOC_END -->
 
-Bên cạnh khung chính này, nhóm kết hợp thêm hai góc nhìn bổ trợ rất tự nhiên:
-- **Góc nhìn Đầu vào từ phía khách hàng (Lý thuyết dịch vụ thống nhất — UST):** Nhắc chúng ta rằng trung tâm không thể tự mình xếp lịch nếu phụ huynh và học sinh không đưa vào 3 thứ: *bản thân người học* (trình độ cấp 2 hay cấp 3), *thông tin lịch rảnh*, và *mục tiêu học tập*. Nếu đầu vào này sơ sài (chỉ đưa đúng 1 khung giờ duy nhất), quy trình phía sau chắc chắn bị nghẽn.
-- **Góc nhìn Đồng tạo giá trị (Logic hướng dịch vụ — SDL):** Phần mềm hay danh sách gia sư chưa phải là giá trị; giá trị chỉ thực sự xuất hiện khi CSKH, Quản lý, Gia sư và Phụ huynh phối hợp ăn ý để đưa học sinh vào đúng lớp.
+---
 
-### 2.2. Chín mảnh ghép của Hệ thống làm việc tại CatPlus
+## 1 Bối cảnh và câu hỏi phân tích
 
-| Thành phần hệ thống | Hình ảnh thực tế đang diễn ra tại CatPlus | Dữ liệu tương ứng trên phần mềm nội bộ |
+### 1.1 Vấn đề dịch vụ
+
+Trong đào tạo lập trình có gia sư kèm trực tiếp, việc tư vấn được một học sinh đăng ký mới chỉ là nửa chặng đường; xếp được lịch học khớp giữa học sinh, phụ huynh và gia sư để lớp thực sự khai giảng mới là bước quyết định. Tại nền tảng **CatPlus** (`https://learn.catplus.site/`), học sinh cấp hai (THCS) và cấp ba (THPT) theo học dưới hai hình thức: lớp kèm riêng 1–1 (đúng 1 học viên) và lớp nhóm nhỏ (bắt buộc đủ từ 3 đến 5 học viên cùng cấp học thì mới mở lớp). Hiện nay, dù phần mềm đã lưu trữ hồ sơ học viên và danh sách lớp, toàn bộ khâu hỏi lịch, tìm gia sư và gom nhóm vẫn do nhân sự xử lý thủ công qua điện thoại và Zalo rồi mới nhập kết quả lên hệ thống.
+
+Tương tự các dịch vụ trực tiếp khác trong khung IHIP, năng lực giảng dạy của gia sư không thể lưu trữ: một ca trống của gia sư vào tối thứ Ba không thể để dành bù cho sự quá tải vào tối Chủ nhật, và hai học sinh rảnh lệch giờ nhau cũng không thể gộp chung vào một lớp nhóm. Ở quy trình hiện tại, nhân viên Chăm sóc khách hàng (CSKH) thường chỉ hỏi phụ huynh một khung giờ mong muốn nhất rồi chuyển cho Quản lý học vụ dò lịch theo thứ tự hồ sơ nào đến trước xếp trước. Khi lượng đăng ký đạt khoảng 60 học viên/tháng, học sinh chọn học nhóm bị rải mỏng ra 28 tổ hợp cấp học – khung giờ trong tuần (14 ca/tuần × 2 cấp học), khiến nhiều lớp dự kiến chỉ gom được 1–2 em, không đủ ngưỡng tối thiểu 3 học viên để khai giảng. Đồng thời, mỗi lần lệch lịch là hồ sơ phải quay vòng hỏi lại giữa Quản lý, Gia sư, CSKH và Phụ huynh, làm thời gian chờ kéo dài gần 3 ngày làm việc.
+
+### 1.2 Phạm vi và câu hỏi phân tích
+
+Nhóm tập trung vào học viên mới đăng ký và phụ huynh trong giai đoạn từ lúc gửi thông tin đăng ký (trạng thái *Chưa liên hệ*) đến khi nhận được lịch học thử/nhập học chính thức (*Đã tham gia*) hoặc dừng hồ sơ (*Đóng thất bại*). Nếu tăng được tỷ lệ ghép lớp và rút ngắn thời gian chờ trên cùng đội ngũ hiện có, cả gia đình người học, nhân viên CSKH, Quản lý học vụ và trung tâm đều hưởng lợi.
+
+Phân tích giữ cố định quy mô vận hành tiêu chuẩn gồm *M* = 10 gia sư đang hoạt động, 2 nhân viên CSKH, 1 Quản lý học vụ và 14 khung giờ học phổ biến mỗi tuần. Nhóm không xét hoạt động chấm bài lập trình tự động sau khi học viên đã vào lớp, biên soạn đề thi hay đối soát học phí, bảng lương.
+
+Nhóm so sánh phương án cơ sở **AS-IS** (CSKH hỏi 1 khung giờ đầu tiên, Quản lý dò tay tuần tự từng ca, hỏi đổi giờ tối đa 2 vòng) với phương án cải tiến **TO-BE** (CSKH thu thập tối đa 1–3 khung giờ khả dụng theo thứ tự ưu tiên, hệ thống chạy quy hoạch nguyên hỗn hợp MILP gom nhóm và gợi ý cặp ghép để Quản lý duyệt trong 1 vòng). Từ góp ý định hướng của giảng viên, nhóm đặt ra ba câu hỏi phân tích:
+
+**Q1.** Trên cùng đội ngũ 10 gia sư và quy định lớp nhóm 3–5 học viên, phương án TO-BE tăng tỷ lệ ghép lớp thành công thêm bao nhiêu điểm phần trăm so với xếp tay AS-IS, và cần thu thập tối thiểu mấy khung giờ rảnh từ phụ huynh?
+
+**Q2.** Việc gom nhóm để cứu các hồ sơ khó xếp lịch tạo ra sự đánh đổi như thế nào đối với điểm độ phù hợp lịch trên tập học viên vào lớp và trên toàn bộ học viên đăng ký?
+
+**Q3.** Quy trình TO-BE rút ngắn thời gian chờ trung bình, phân vị P90 và giảm tải dò lịch thủ công cho Quản lý học vụ ra sao khi xét đến dòng hồ sơ đến ngẫu nhiên theo thời gian?
+
+### 1.3 Dữ liệu và chỉ số
+
+Trong giai đoạn hoàn thiện dữ liệu lịch sử trên máy chủ, nhóm xây dựng bộ dữ liệu mô phỏng tái lập (hạt giống ngẫu nhiên cố định `seed = 42`, gồm 20 chu kỳ tháng độc lập, tương đương 1.200 lượt hồ sơ học viên) bám sát cấu trúc cơ sở dữ liệu thực tế của dự án CatPlus (ràng buộc sĩ số lớp 1–1 bằng 1, lớp nhóm từ 3 đến 5 học viên, phân cấp THCS/THPT và lộ trình 5 chặng chăm sóc khách hàng). Toàn bộ mã nguồn được thiết kế tách biệt đầu vào để nạp trực tiếp tệp CSV ẩn danh trích xuất từ máy chủ sản xuất qua công cụ `export_real_data_template.py`. Bảng 1.1 định nghĩa các chỉ số đo lường xuyên suốt báo cáo.
+
+**Bảng 1.1.** Các chỉ số dùng trong báo cáo
+
+| Chỉ số | Định nghĩa và cách tính | Loại |
 | :--- | :--- | :--- |
-| **1. Khách hàng** | Học sinh (THCS, THPT) và Phụ huynh — người trực tiếp thương lượng giờ học và đóng học phí. | Hồ sơ học viên (năm sinh, mục tiêu, thông tin phụ huynh, trạng thái tiếp nhận). |
-| **2. Dịch vụ cung cấp** | Tư vấn lộ trình, tổ chức buổi học thử và ghép vào lớp lập trình 1–1 hoặc lớp nhóm 3–5 học viên. | Dữ liệu buổi học thử, thông tin lớp học và danh sách ghi danh. |
-| **3. Quy trình làm việc** | Tiếp nhận hồ sơ → Gọi tư vấn lấy giờ rảnh → Dò lịch gia sư & gom nhóm → Hỏi xác nhận gia sư → Báo lịch chốt. | Lộ trình 5 bước: *Chưa liên hệ → Chờ test → Chờ học thử → Chờ lớp → Đã tham gia*. |
-| **4. Những người tham gia** | Nhân viên CSKH, Quản lý học vụ, đội ngũ Gia sư, cùng sự phối hợp của Phụ huynh. | Bảng phân công nhân viên CSKH phụ trách và mã định danh gia sư. |
-| **5. Thông tin sử dụng** | Cấp học, hình thức lớp (1–1 hay nhóm), khung giờ rảnh của trò, lịch trống và số lớp tối đa của thầy. | Quy tắc lịch học hàng tuần (thứ, giờ bắt đầu, thời lượng) và nhật ký trao đổi. |
-| **6. Công nghệ hỗ trợ** | Phần mềm quản trị web của CatPlus kết hợp với điện thoại và Zalo để nhắn tin trao đổi. | Hai phân hệ phần mềm Quản lý học vụ và Chăm sóc khách hàng *(chưa có công cụ gợi ý xếp lịch)*. |
-| **7. Hạ tầng nền tảng** | Đường truyền mạng, phòng học trực tuyến (Google Meet/Zoom) hoặc phòng học trực tiếp tại cơ sở. | Cấu hình hình thức học (*Trực tuyến / Trực tiếp*) và đường dẫn phòng học. |
-| **8. Môi trường bên ngoài** | Lịch học chính khóa và học thêm ở trường của học sinh rất dày (thường chỉ rảnh tối và cuối tuần); sự cạnh tranh từ các trung tâm khác. | Thống kê lý do học viên hủy đăng ký: *Lệch lịch học*, *Chọn trung tâm khác*. |
-| **9. Định hướng chiến lược** | Giữ sự tư vấn gần gũi, sát sao của con người nhưng phải tăng tốc độ xếp lớp và gom đủ sĩ số lớp nhóm để tối ưu chi phí. | Chính sách tách lớp 1–1 và lớp nhóm 3–5 học viên theo từng cấp học. |
+| *R*<sub>ghép</sub> | Tỷ lệ học viên được xếp lớp hợp lệ (1–1 hoặc nhóm 3–5 người) trên tổng số đăng ký (%) | KPI trọng tâm 1 |
+| *N*<sub>rớt</sub> | Số hồ sơ không xếp được lớp mỗi tháng (do lệch lịch hoặc nhóm dưới 3 học viên) | Kết quả mô hình |
+| Fit<sub>ghép</sub> | Điểm phù hợp lịch trung bình tính riêng trên các học viên đã xếp được lớp (thang 100) | KPI trọng tâm 2a |
+| Fit<sub>chung</sub> | Điểm phù hợp lịch trung bình tính trên toàn bộ học viên đăng ký (rớt tính 0 điểm) | KPI trọng tâm 2b |
+| *W*, P90 | Thời gian chờ trung bình và phân vị 90 từ lúc đăng ký tới lúc chốt lịch (giờ làm việc; 8h = 1 ngày) | KPI trọng tâm 3 |
+| SLA<sub>16h</sub> | Tỷ lệ hồ sơ hoàn tất chốt lịch trong vòng 2 ngày làm việc (*W* ≤ 16 giờ, %) | Mức dịch vụ hàng đợi |
+| *L*, *ρ*<sub>QL</sub> | Số hồ sơ tồn đọng trung bình trong hệ thống (*L* = *λW*) và tỷ lệ bận của Quản lý (%) | Chỉ số hàng đợi |
 
-### 2.3. Bốn gốc rễ gây lỗi nhìn từ khung Hệ thống làm việc
-Khi một học sinh đăng ký mà không vào học được, thay vì đổ lỗi chung chung là "do CSKH chậm" hay "do thiếu gia sư", khung Hệ thống làm việc giúp bóc tách 4 nguyên nhân rất rõ ràng:
-1. **Thiếu hụt thông tin đầu vào:** CSKH chỉ hỏi 1 khung giờ duy nhất, trong khi thực tế nhiều học sinh có thể thu xếp được 2–3 buổi khác nhau trong tuần nếu được hỏi kỹ ngay từ đầu. Ngoài ra, lịch rảnh của gia sư chưa được gom về một bảng chung mà phải nhắn hỏi từng người.
-2. **Cách thức xử lý thủ công theo từng ca lẻ:** Quản lý xử lý từng học sinh một theo thứ tự thời gian. Khi xếp lớp nhóm, cách làm rời rạc này làm học sinh bị phân tán ra quá nhiều khung giờ lẻ tẻ, không gom đủ 3 em/nhóm để mở lớp.
-3. **Công nghệ mới chỉ dùng để "ghi sổ":** Phần mềm hiện tại chỉ được mở ra để nhập dữ liệu sau khi Quản lý đã tự tìm lịch xong ở ngoài, chưa giúp Quản lý tính toán xem nên ghép những em nào vào chung một nhóm thì có lợi nhất.
-4. **Thiếu quy chế gom đợt và giới hạn thời gian chờ:** Trung tâm chưa có quy định chốt danh sách theo từng khung giờ cố định trong ngày để gom nhóm, và chưa có quy ước rõ ràng về thời gian tối đa gia sư phải phản hồi tin nhắn nhận lớp.
+### 1.4 Cách tiếp cận
+
+Nhóm mô tả hệ thống bằng khung Work System, logic hướng dịch vụ và bản đồ nguồn lực (Mục 2), sau đó dùng sơ đồ BPMN 2.0 để lần theo quy trình thủ công hiện tại (Mục 3.1). Phân tích thời gian từng chặng và mô phỏng hàng đợi giúp chỉ ra hai điểm nghẽn chính là tình trạng xé lẻ lớp nhóm dưới 3 người và vòng lặp chờ tin nhắn Zalo (Mục 3.2 và 3.3). Từ đó, nhóm xây dựng mô hình quy hoạch nguyên hỗn hợp (MILP) để gom cụm lớp nhóm kết hợp ghép đôi 1–1 (Mục 4), triển khai chuỗi xử lý tự động bằng Python (Mục 5), đối chiếu kết quả qua 20 lần lặp độc lập kèm đường biên Pareto và ba kịch bản độ nhạy (Mục 6), trước khi lập bảng quyết định và lộ trình áp dụng thực tế cho trung tâm (Mục 7).
 
 ---
 
-## 3. BẢN ĐỒ NGUỒN LỰC VÀ CƠ CHẾ ĐỒNG TẠO GIÁ TRỊ
+## 2 Hệ thống dịch vụ đào tạo lập trình CatPlus
 
-### 3.1. Các nguồn lực tham gia vào quá trình xếp lớp
-Để một lớp học được mở ra trơn tru, hệ thống phải huy động và kết hợp 4 nhóm nguồn lực dưới đây:
+### 2.1 Mô tả hệ thống bằng Work System Framework
 
-| Nhóm nguồn lực | Vai trò trong dịch vụ | Biểu hiện cụ thể tại CatPlus | Ai đóng góp & Ai sử dụng |
-| :--- | :--- | :--- | :--- |
-| **1. Con người & Kỹ năng chuyên môn** | Nguồn lực chủ động tạo ra sự thay đổi | Kỹ năng tư vấn, thấu hiểu phụ huynh của **CSKH**; kinh nghiệm điều phối lớp của **Quản lý**; kiến thức thuật toán và khả năng sư phạm của **Gia sư**. | Đội ngũ nhân sự và gia sư đóng góp để phục vụ học viên. |
-| **2. Quỹ thời gian & Khung giờ trống** | Nguồn lực hữu hạn cần được khớp nối | Các buổi rảnh trong tuần của **Học viên** và quỹ ca dạy còn trống (cùng giới hạn số lớp nhận dạy tối đa) của từng **Gia sư**. | Học viên và Gia sư cùng đưa vào; Quản lý là người kết nối. |
-| **3. Dữ liệu & Công cụ phần mềm** | Phương tiện lưu trữ và hỗ trợ tính toán | Hồ sơ học viên, lịch lớp đang mở trên hệ thống CatPlus; và *(ở phương án cải tiến)* là **công cụ tính toán gợi ý ghép lớp tối ưu**. | Nền tảng CatPlus cung cấp cho CSKH và Quản lý sử dụng hàng ngày. |
-| **4. Quy định & Chính sách lớp học** | Khung quy tắc đảm bảo chất lượng và chi phí | Quy định lớp 1–1 đúng 1 học viên, lớp nhóm phải đủ từ 3 đến 5 học viên cùng cấp học (THCS hoặc THPT), quy trình học thử trước khi vào học chính thức. | Ban giám đốc trung tâm thiết lập để điều tiết toàn bộ việc mở lớp. |
+Nhóm chọn Work System Framework (WSF) của Alter [1] làm khung phân tích chủ đạo để mô tả cách đội ngũ CSKH, Quản lý học vụ và Gia sư sử dụng thông tin lịch rảnh cùng phần mềm quản trị nhằm đưa học viên vào lớp phù hợp. Khung WSF giúp tách bạch giữa năng lực chuyên môn của gia sư với cách thức thu thập thông tin và quy tắc điều phối lịch học. Nhờ đó, nhóm có thể cải thiện tỷ lệ mở lớp bằng cách thay đổi quy trình thu thập khung giờ và công cụ gợi ý ghép nhóm mà không cần quy lỗi cho nhân sự hay đòi hỏi tuyển thêm gia sư ngay lập tức. Bảng 2.1 trình bày chín thành phần của hệ thống tại CatPlus.
 
-### 3.2. Sơ đồ Bản đồ nguồn lực (Resource Map)
+**Bảng 2.1.** Chín thành phần Work System của dịch vụ ghép đôi và xếp lịch tại CatPlus
 
-![Bản đồ nguồn lực và cơ chế đồng tạo giá trị hệ thống CatPlus](./fig0_resource_map.png)
-*Hình 1. Bản đồ nguồn lực (Resource Map) thể hiện ranh giới hệ thống, 4 nhóm nguồn lực, luồng trao đổi thông tin giữa 5 bên tham gia, lợi ích – chi phí – rủi ro và bảng chú giải ký hiệu (nhóm thiết kế nội dung; AI hỗ trợ mã vẽ biểu đồ; nhóm tự kiểm tra tính chính xác).*
+| Thành phần | Trong hệ thống CatPlus | Vai trò trong đề tài |
+| :--- | :--- | :--- |
+| Khách hàng | Học sinh (THCS, THPT) và phụ huynh trực tiếp trao đổi lịch học, học phí | Nguồn phát sinh nhu cầu và cung cấp khung giờ rảnh đầu vào |
+| Sản phẩm, dịch vụ | Tư vấn lộ trình, buổi học thử và lớp học chính thức (kèm 1–1 hoặc nhóm 3–5 em) | Đánh giá bằng tỷ lệ ghép thành công, độ hợp lịch và thời gian chờ |
+| Quy trình | Tiếp nhận hồ sơ, gọi tư vấn, dò lịch gia sư, gom nhóm, xác nhận và chốt lớp | Đối tượng mô hình hóa BPMN (AS-IS → TO-BE) và đo thời gian chặng |
+| Người tham gia | Nhân viên CSKH (2 người), Quản lý học vụ (1 người), đội ngũ Gia sư (10 người) | Giữ vai trò tư vấn con người và phê duyệt cuối cùng ở cả AS-IS và TO-BE |
+| Thông tin | Cấp học, loại lớp đăng ký, khung giờ rảnh của trò, ca trống và trần số lớp của thầy | Đầu vào quyết định khả năng gom đủ sĩ số nhóm từ 3 đến 5 học viên |
+| Công nghệ | Phần mềm web nội bộ (quản lý học vụ, chăm sóc khách hàng) và kênh Zalo, điện thoại | Hiện mới dùng ghi nhận hậu kiểm; đề xuất bổ sung module gợi ý MILP |
+| Môi trường | Lịch học văn hóa dày đặc của học sinh (dồn vào tối và cuối tuần); cạnh tranh giữ khách | Nguyên nhân làm trùng khung giờ cao điểm và rớt khách nếu chờ lâu |
+| Hạ tầng | Phòng học trực tuyến (Google Meet/Zoom) và phòng học trực tiếp, máy chủ dữ liệu | Nền tảng vận hành lớp học sau khi lịch đã được chốt |
+| Chiến lược | Kết hợp tư vấn sát sao của con người với hiệu quả gom nhóm để tối ưu chi phí gia sư | Biến điều chỉnh qua trọng số đánh đổi giữa số ca mở và tỷ lệ nhận lớp |
 
-### 3.3. Giá trị được tạo ra và bị đứt gãy ở đâu?
-Trong dịch vụ giáo dục, **đầu ra kỹ thuật (Output)** chỉ là một tờ lịch học thử hoặc một mã lớp học được tạo trên phần mềm. Nhưng thứ phụ huynh và học sinh thực sự cần là **kết quả dịch vụ (Outcome)**: em học sinh được xếp vào một lớp vừa sức, hợp giờ sinh hoạt của gia đình mà không phải chờ đợi cả tuần lễ; từ đó dẫn tới **giá trị lâu dài (Value)**: em giữ được hào hứng ban đầu, học tiến bộ và gắn bó lâu dài với trung tâm.
+### 2.2 Bản đồ nguồn lực và đồng tạo giá trị
 
-Nếu ở bước đầu, phụ huynh chỉ đưa 1 khung giờ hẹp mà Quản lý lại dò tay không ra nhóm đủ 3 người, hồ sơ bị dừng lại. Khi đó, dù gia sư của trung tâm rất giỏi và nền tảng học tập rất tốt, toàn bộ giá trị phía sau đều không thể đến được với học sinh.
+Hình 2.1 thể hiện ranh giới hệ thống, bốn nhóm nguồn lực nội tại và các luồng tương tác giữa năm chủ thể tham gia. Hạ tầng mạng, công cụ liên lạc bên ngoài (Zalo, điện thoại) và các kỳ thi học sinh giỏi nằm ngoài đường bao ranh giới vì đề xuất cải tiến không can thiệp vào các yếu tố này.
+
+![Bản đồ nguồn lực hệ thống CatPlus](./fig0_resource_map.png)
+*Hình 2.1. Bản đồ nguồn lực và cơ chế đồng tạo giá trị của hệ thống ghép đôi – xếp lịch CatPlus; thể hiện ranh giới phân tích, bốn nhóm nguồn lực, lợi ích, chi phí/rủi ro và bảng chú giải ký hiệu (nhóm thiết kế cấu trúc; AI hỗ trợ mã vẽ Matplotlib; nhóm tự kiểm chứng).*
+
+Theo logic hướng dịch vụ (SDL) của Vargo và Lusch [2], cơ sở dữ liệu hồ sơ, danh sách lớp và các khung giờ trống là nguồn lực bị tác động (operand resources). Chúng chỉ chuyển thành kết quả thực tế khi CSKH, Quản lý và Gia sư vận dụng kỹ năng tư vấn, kinh nghiệm sư phạm và quy tắc điều phối — tức nguồn lực tác động (operant resources) — để tích hợp lịch của thầy và trò. Dưới góc nhìn Lý thuyết dịch vụ thống nhất (UST) của Sampson [3], phụ huynh và học viên tham gia trực tiếp vào quá trình đồng tạo giá trị ngay từ bước cung cấp thông tin lịch rảnh: nếu gia đình chỉ đưa ra đúng 1 khung giờ cứng nhắc, không gian ghép nhóm bị thu hẹp mạnh; ngược lại, khi CSKH khai thác được 2–3 khung giờ có thể thu xếp, khả năng gom đủ nhóm 3–5 học viên tăng vọt.
+
+Bản đồ cũng chỉ rõ lợi ích, chi phí và rủi ro của từng bên. Học viên được vào học sớm và đúng trình độ nhưng có rủi ro bỏ cuộc nếu phải chờ đổi lịch nhiều lần. CSKH và Quản lý kiểm soát được chất lượng tư vấn nhưng chịu tải lớn khi phải nhắn tin hỏi lịch thủ công qua nhiều vòng. Gia sư có thêm thu nhập và lịch dạy ổn định song có thể từ chối ca đột xuất nếu lịch rảnh trên hệ thống không được cập nhật định kỳ.
 
 ---
 
-## 4. QUY TRÌNH HIỆN TẠI (BPMN AS-IS) VÀ CHẨN ĐOÁN ĐIỂM NGHẼN
+## 3 Quy trình hiện tại và chẩn đoán
 
-### 4.1. Sơ đồ quy trình BPMN 2.0 hiện tại (AS-IS)
-Để nhìn rõ đường đi của một hồ sơ học viên qua tay những ai và bị tắc ở đâu, nhóm mô hình hóa quy trình hiện tại theo chuẩn BPMN 2.0 với 3 khối (Pool) tách biệt: **Phụ huynh & Học viên**, **Đội ngũ Vận hành CatPlus** (chia làm 3 làn: *CSKH*, *Quản lý học vụ*, *Hệ thống phần mềm*) và **Gia sư**.
-- **Tệp BPMN 2.0 gốc (mở trực tiếp trên công cụ https://demo.bpmn.io/new):** [catplus_matching_as_is.bpmn](./catplus_matching_as_is.bpmn)
+### 3.1 Quy trình AS-IS
+
+Hình 3.1 mô tả quy trình hiện tại bằng chuẩn BPMN 2.0 từ lúc phụ huynh gửi đăng ký đến khi học viên nhập học thành công (hoặc đóng hồ sơ thất bại). Sơ đồ gồm ba pool độc lập: *Phụ huynh & Học viên*, *Vận hành CatPlus* (chia thành ba lane nội bộ cho *CSKH*, *Quản lý học vụ* và *Hệ thống phần mềm*) và *Gia sư*. Mọi giao tiếp giữa ba pool đều đi qua luồng thông điệp nét đứt; luồng trình tự nét liền chỉ nối các bước trong cùng một pool và sử dụng cổng rẽ nhánh loại trừ XOR (`×`).
 
 ![Sơ đồ BPMN 2.0 quy trình AS-IS](./fig_bpmn_as_is.png)
-*Hình 2. Sơ đồ quy trình BPMN 2.0 hiện tại (AS-IS) thể hiện rõ các bước chuyển giao giữa Phụ huynh – CSKH – Quản lý – Gia sư và các vòng lặp khi lệch lịch (nhóm xây dựng quy trình; AI hỗ trợ vẽ đồ họa; nhóm kiểm tra toàn bộ ký pháp chuẩn BPMN).*
+*Hình 3.1. BPMN AS-IS của quy trình tiếp nhận, ghép gia sư và xếp lịch học cho một hồ sơ học viên mới (tệp chuẩn mở trên bpmn.io: `catplus_matching_as_is.bpmn`; nhóm xây dựng logic; AI hỗ trợ kết xuất đồ họa; nhóm kiểm tra 10 quy tắc BPMN).*
 
-### 4.2. Kiểm tra tính chuẩn xác của sơ đồ BPMN (Theo 10 tiêu chuẩn Bài L3B)
-Nhóm đã rà soát kỹ sơ đồ theo đúng danh sách 10 lỗi sinh viên thường mắc mà giảng viên lưu ý trong bài giảng L3B:
-1. **Đơn vị quy trình rõ ràng:** Sơ đồ theo dõi trọn vẹn 01 hồ sơ đăng ký học của 01 học viên mới.
-2. **Dùng đúng cổng rẽ nhánh lựa chọn (XOR — dấu ×):** Các điểm kiểm tra (*Khớp lịch và đủ nhóm?*, *Đã thử quá 2 vòng?*, *Phụ huynh đồng ý đổi giờ?*) đều là lựa chọn loại trừ nên dùng cổng XOR, không dùng nhầm cổng song song (AND).
-3. **Không kéo mũi tên liền xuyên qua các khối độc lập:** Giữa *Phụ huynh*, *Trung tâm CatPlus* và *Gia sư* chỉ giao tiếp bằng **luồng tin nhắn/cuộc gọi (mũi tên nét đứt)**; mũi tên nét liền chỉ chạy bên trong nội bộ từng khối.
-4. **Mọi cổng rẽ nhánh đều có nhãn điều kiện rõ ràng:** Ghi rõ nhánh *Có (Khớp)*, *Không*, *Chưa (< 2 vòng)*, *Quá 2 vòng*, *Hủy chờ*.
-5. **Tên công việc viết theo cấu trúc Động từ + Đối tượng:** Ví dụ: *Tư vấn & hỏi 1 khung giờ*, *Dò lịch thủ công & nhắn hỏi Gia sư*, *Cập nhật trạng thái nhập học*.
-6. **Phân biệt đúng loại ký hiệu:** Tách rõ công việc do người làm, bước hệ thống tự ghi dữ liệu, sự kiện chờ tin nhắn (vòng tròn đôi có hình phong bì) và sự kiện đếm giờ quá hạn (vòng tròn đôi có kim đồng hồ).
-7. **Không vẽ việc "Chờ đợi" thành một ô công việc:** Việc chờ gia sư trả lời Zalo được biểu diễn đúng bằng *Sự kiện chờ tin nhắn (Intermediate Message Catch Event)* gắn kèm *Đồng hồ giới hạn 8 giờ*.
-8. **Đồng nhất mức độ chi tiết:** Toàn bộ sơ đồ giữ ở mức các bước nghiệp vụ vận hành, không trộn lẫn các dòng lệnh kỹ thuật phần mềm vào sơ đồ.
-9. **Đầy đủ các nhánh ngoại lệ thực tế:** Thể hiện rõ 3 tình huống thất bại: (a) Quá 24 giờ không liên hệ được phụ huynh, (b) Gia sư quá 8 giờ không phản hồi, (c) Đã hỏi đổi lịch quá 2 vòng vẫn không khớp hoặc phụ huynh hủy đăng ký.
-10. **Kiểm tra chạy thử qua 3 tình huống thực tế (Scenario Walkthrough):**
-    - *Tình huống 1 (Thuận lợi):* Phụ huynh đăng ký → CSKH gọi lấy 1 khung giờ → Quản lý tìm được ngay gia sư rảnh (hoặc ghép vừa khít vào lớp nhóm đang có 2 em chờ người thứ 3) → Gia sư gật đầu → Báo phụ huynh học thử và nhập học ngay ở vòng đầu tiên.
-    - *Tình huống 2 (Phải làm lại vòng 2 — Rework):* Khung giờ đầu tiên gia đình chọn bị trùng lịch gia sư hoặc lớp nhóm chờ mãi chỉ có 1–2 em → Hồ sơ phải trả ngược về CSKH gọi thuyết phục phụ huynh đổi sang khung giờ thứ 2 → Phụ huynh đồng ý đổi → Quản lý dò lại vòng 2 và chốt được lớp.
-    - *Tình huống 3 (Thất bại — Mất học viên):* Học sinh chỉ rảnh đúng 1 buổi duy nhất mà không có gia sư/nhóm phù hợp, hoặc sau 2 lần gọi đổi giờ phụ huynh nản lòng xin hủy → Hệ thống đóng hồ sơ thất bại.
+Khi nhận hồ sơ mới, hệ thống ghi nhận trạng thái chờ xử lý và chuyển cho CSKH gọi tư vấn để lấy mục tiêu học tập cùng 1 khung giờ ưu tiên đầu tiên (nếu quá 24 giờ không liên hệ được, sự kiện biên đồng hồ sẽ chuyển hồ sơ sang đóng thất bại). Tiếp theo, hồ sơ được bàn giao sang Quản lý học vụ để dò lịch bằng mắt theo thứ tự đến trước phục vụ trước và nhắn Zalo hỏi gia sư. Tại sự kiện chờ gia sư phản hồi (giới hạn 8 giờ), nếu gia sư báo bận hoặc lớp nhóm dự kiến chưa gom đủ tối thiểu 3 học viên cùng cấp học, quy trình rẽ sang kiểm tra số vòng thử: nếu dưới 2 vòng, hồ sơ bị trả ngược về CSKH để gọi thuyết phục phụ huynh chọn khung giờ khác (*Rework*). Nếu sau 2 vòng vẫn không khớp hoặc phụ huynh xin hủy chờ, hệ thống ghi nhận đóng hồ sơ thất bại.
 
-### 4.3. Ba điểm nghẽn cốt lõi nhìn từ sơ đồ hiện tại
-Nhìn vào Hình 2, có thể chỉ ra ngay 3 nguyên nhân thực tế làm giảm hiệu quả của trung tâm:
-1. **Nút cổ chai tại bàn làm việc của Quản lý học vụ:** Mọi hồ sơ đều đổ dồn về 1 Quản lý để dò lịch bằng mắt và nhắn Zalo cho từng gia sư. Khi có 60 hồ sơ/tháng kèm theo gần một nửa số ca phải dò đi dò lại vòng 2, Quản lý mất tới gần một nửa quỹ thời gian làm việc chỉ để làm việc thủ công này.
-2. **Độ trễ lớn ở các bước "ngồi chờ tin nhắn":** Thời gian Quản lý thực sự ngồi tìm lịch chỉ mất khoảng 1–1,5 giờ cho mỗi ca, nhưng thời gian **đứng chờ** gia sư trả lời Zalo (2,5–7,5 giờ) và **chờ** CSKH hỏi lại phụ huynh (thêm 3–7 giờ nữa) mới là thứ ngốn hết 2–3 ngày làm việc.
-3. **Tình trạng xé lẻ lớp nhóm (Group Fragmentation):** Vì hồ sơ ai đến trước được mở lớp nháp trước theo đúng 1 khung giờ duy nhất, học sinh đăng ký học nhóm bị chia nhỏ ra quá nhiều ca lẻ (mỗi ca 1–2 em), không tài nào chạm được mốc tối thiểu 3 học viên để khai giảng.
+### 3.2 Phân tích thời gian theo từng chặng
 
----
+Trên 1.200 lượt hồ sơ mô phỏng từ 20 tháng vận hành hiện trạng AS-IS (Bảng 3.1 và Hình 3.2), tổng thời gian trung bình từ lúc đăng ký tới lúc kết thúc quy trình là **22,56 giờ làm việc** (tương đương **2,82 ngày làm việc**, quy ước 8 giờ làm việc/ngày), với phân vị P90 lên tới **31,29 giờ** (3,91 ngày). Tỷ lệ hồ sơ hoàn tất trong vòng 2 ngày làm việc (*W* ≤ 16 giờ) chỉ đạt **18,0%**.
 
-## 5. PHÂN TÍCH CHUYÊN SÂU VÀ ĐO LƯỜNG BẰNG MÔ HÌNH
+**Bảng 3.1.** Thời gian từng chặng (giờ làm việc) của một hồ sơ trong quy trình hiện tại AS-IS (20 chu kỳ tháng, *N* = 60 hồ sơ/tháng)
 
-> **Ghi chú minh bạch về dữ liệu:** Để kiểm chứng giải pháp một cách khách quan trước khi trung tâm hoàn tất xuất toàn bộ dữ liệu lịch sử từ máy chủ, nhóm xây dựng mô hình mô phỏng và tối ưu hóa bằng ngôn ngữ Python ([CatPlus_Sim_Opt_Model.py](./CatPlus_Sim_Opt_Model.py), cố định hạt giống ngẫu nhiên `seed=42` để bất kỳ ai chạy lại cũng ra đúng kết quả trong [simulation_results.json](./simulation_results.json)). Các quy tắc trong mô hình (tỷ lệ cấp học THCS/THPT, lớp 1–1 đúng 1 em, lớp nhóm từ 3 đến 5 em, 14 khung giờ trong tuần) đều lấy đúng theo thiết kế thực tế của hệ thống CatPlus. Khi có file dữ liệu thực tế ẩn danh từ máy chủ (xuất qua công cụ [export_real_data_template.py](./export_real_data_template.py)), nhóm chỉ cần nạp file CSV vào là mô hình cập nhật ngay kết quả thực tế.
+| Chặng xử lý trong hành trình học viên | Thời gian TB (giờ) | Tỷ trọng (%) | Nguyên nhân gây trễ chủ yếu tại chặng |
+| :--- | :---: | :---: | :--- |
+| 1. Tiếp nhận và CSKH gọi tư vấn lần đầu | 1,95 | 8,6% | Khoảng 30% phụ huynh bận máy lần đầu, phải chờ 2–5,5 giờ gọi lại |
+| 2. Quản lý dò lịch, hỏi gia sư và lặp lại đổi giờ | 15,66 | 69,4% | Chờ gia sư trả lời Zalo (2,5–7,5h/vòng), hỏi lại phụ huynh và chờ gom đủ nhóm 3 em |
+| 3. Chốt lịch học thử và xác nhận nhập học | 4,96 | 22,0% | Xác nhận chéo lần cuối giữa phụ huynh và gia sư trước buổi đầu tiên |
+| **Tổng chu trình toàn quy trình (*W*)** | **22,56** | **100,0%** | **Phân vị P90 = 31,29 giờ (3,91 ngày); tỷ lệ đạt SLA ≤ 16h = 18,0%** |
 
-### 5.1. Thiết lập quy mô bài toán khảo sát
-Nhóm khảo sát hoạt động tuyển sinh và xếp lớp của trung tâm trong chu kỳ **1 tháng (30 ngày, mỗi ngày tính 8 giờ làm việc = 240 giờ làm việc/tháng)** với các thông số sát thực tế:
-- **Lượng học viên đăng ký mới:** Trung bình **60 học viên/tháng** (tương đương tốc độ đến trung bình **0,25 học viên/giờ làm việc**, hay 2 học viên/ngày).
-  - Trong đó: 55% là học sinh cấp 2 (THCS), 45% là học sinh cấp 3 (THPT).
-  - Về hình thức lớp: 40% đăng ký học kèm riêng **1–1** (sĩ số = 1); 60% đăng ký học **Nhóm** (sĩ số bắt buộc từ **3 đến 5 học viên** cùng cấp học).
-  - Về lịch rảnh của học sinh trong 14 khung giờ mỗi tuần (các buổi tối T2–T6 ca 18h00, 19h45 và các ca sáng/chiều/tối T7, CN): có 20% học sinh lịch rất hẹp (chỉ rảnh đúng 1 khung giờ), 45% rảnh được 2 khung giờ, và 35% linh hoạt được 3 khung giờ.
-- **Nguồn lực của trung tâm:**
-  - Có **10 gia sư** đang hoạt động (5 người dạy được cả THCS & THPT, 3 người chuyên THCS, 2 người chuyên THPT). Mỗi gia sư có từ 5 đến 7 khung giờ trống trong tuần và nhận dạy tối đa từ 3 đến 5 lớp.
-  - Đội ngũ vận hành gồm **2 nhân viên CSKH** và **1 Quản lý học vụ**.
-
-### 5.2. Mô hình 1 — Công cụ Gợi ý Ghép lớp & Gom nhóm Tối ưu (Quy hoạch nguyên — Bài L5)
-Thay vì để Quản lý phải nhìn bảng Excel/danh sách rồi nhẩm tính từng em, ở phương án cải tiến (TO-BE), sau khi CSKH hỏi đầy đủ 1–3 khung giờ rảnh của học sinh, phần mềm sẽ chạy một **bài toán tối ưu hóa (Quy hoạch nguyên hỗn hợp — MILP)** để tìm cách sắp xếp tốt nhất cho cả đợt hồ sơ.
-
-Cách máy tính giải bài toán này có thể hiểu rất đơn giản qua **5 yếu tố cốt lõi** (theo đúng phương pháp luận Bài L5):
-
-1. **Dữ liệu đưa vào máy:** Danh sách học viên (cấp học, muốn học 1–1 hay học nhóm, các khung giờ rảnh kèm điểm ưu tiên: ưu tiên 1 = 100 điểm, ưu tiên 2 = 80 điểm, ưu tiên 3 = 60 điểm) và danh sách gia sư (dạy được cấp nào, rảnh giờ nào, nhận tối đa mấy lớp).
-2. **Các quyết định máy cần chọn (Biến quyết định):**
-   - Học viên nào được xếp vào ca dạy nào của gia sư nào? *(Chọn Có = 1 hoặc Không = 0)*.
-   - Ca dạy đó của gia sư sẽ mở thành lớp 1–1 hay lớp nhóm 3–5 người, cho cấp THCS hay THPT? *(Chọn Có = 1 hoặc Không = 0)*.
-   - Nếu một học viên có lịch quá hẹp, không thể khớp với bất kỳ gia sư hay nhóm nào, máy sẽ đưa hồ sơ đó vào một **"danh sách chờ xử lý riêng" (biến lớp ảo)** để báo cho Quản lý biết.
-3. **Mục tiêu tối ưu của bài toán (Hàm mục tiêu):**
-   Máy sẽ tìm phương án sao cho đạt được 3 mục tiêu theo thứ tự ưu tiên từ cao xuống thấp:
-   - **Ưu tiên số 1 (Quan trọng nhất):** Giảm tối đa số học viên bị rớt lớp (mỗi học viên không xếp được lớp sẽ bị tính một mức phạt rất nặng là **1.000 điểm** để ép thuật toán phải tìm mọi cách cứu được nhiều học viên nhất).
-   - **Ưu tiên số 2:** Tổng điểm phù hợp lịch của học viên là cao nhất (ưu tiên xếp vào khung giờ số 1 được 100 điểm, nếu cần gom nhóm để đủ 3 người thì mới điều chỉnh những bạn linh hoạt sang khung giờ số 2 được 80 điểm hoặc số 3 được 60 điểm).
-   - **Ưu tiên số 3:** Gom gọn các học viên học nhóm vào chung các lớp từ 3 đến 5 người để tiết kiệm số ca gia sư phải mở.
-
-> **Biểu thức tính Tổng điểm mục tiêu của thuật toán (càng nhỏ càng tốt):**
-> **Tổng chi phí = (1.000 × Số học viên không xếp được lớp) − (Tổng điểm phù hợp lịch của các học viên được xếp) + (Chi phí mở lớp × Số ca gia sư sử dụng)**
-
-4. **Bốn quy tắc bắt buộc máy phải tuân thủ (Các ràng buộc cứng):**
-   - *Quy tắc 1 (Mỗi học viên một chỗ):* Mỗi học viên chỉ được xếp vào tối đa 1 lớp học phù hợp; nếu không xếp được thì phải ghi nhận vào danh sách chưa ghép được.
-   - *Quy tắc 2 (Gia sư không phân thân):* Tại mỗi khung giờ, một gia sư chỉ được dạy tối đa 1 lớp (hoặc dạy 1–1, hoặc dạy 1 nhóm, không trùng giờ).
-   - *Quy tắc 3 (Đúng chuẩn sĩ số lớp của trung tâm):* Nếu mở lớp 1–1 thì sĩ số đúng bằng 1 học viên. **Nếu mở lớp nhóm thì sĩ số bắt buộc phải từ 3 đến 5 học viên cùng cấp học** (dưới 3 học viên thì không được phép mở lớp nhóm).
-   - *Quy tắc 4 (Không vượt sức của gia sư):* Tổng số lớp một gia sư nhận trong tháng không được vượt quá số lớp tối đa mà gia sư đó đăng ký.
-5. **Ứng dụng kết quả vào quản lý:** Máy giải toàn bộ bài toán này trong **chưa đầy 0,5 giây** và xuất ra bảng gợi ý: *"Nên gom các em A, B, C, D vào lớp nhóm THCS tối Thứ 3 ca 19h45 của Gia sư X; xếp em E học 1–1 với Gia sư Y..."* để Quản lý học vụ xem và bấm duyệt.
-
-### 5.3. Mô hình 2 — Mô phỏng Hàng đợi Quy trình làm việc của Con người (SimPy — Bài L4)
-Sau khi có kết quả ghép lớp, nhóm đưa toàn bộ hồ sơ chạy qua mô hình **mô phỏng dòng công việc theo thời gian thực (thư viện SimPy)** với 2 nhân viên CSKH và 1 Quản lý học vụ để đo chính xác thời gian học viên phải chờ:
-- **Ở quy trình hiện tại (AS-IS):** CSKH gọi tư vấn lấy 1 khung giờ (mất 0,45–1,15 giờ làm việc; có 30% trường hợp phụ huynh bận phải chờ 2–5,5 giờ sau mới gọi lại được). Tiếp theo, Quản lý ngồi dò lịch tay (0,85–1,75 giờ) rồi nhắn Zalo chờ gia sư trả lời (mất 2,5–7,5 giờ). Với những hồ sơ lệch lịch hoặc lớp nhóm không gom đủ 3 người, hồ sơ phải quay vòng lại cho CSKH gọi xin phụ huynh đổi giờ (tốn thêm một vòng chờ 3–7 giờ nữa). Cuối cùng là bước chốt lịch học thử (4–10 giờ).
-- **Ở quy trình cải tiến (TO-BE):** Ngay cuộc gọi đầu, CSKH hỏi luôn 1–3 khung giờ gia đình có thể học (cuộc gọi dài hơn một chút: 0,55–1,25 giờ). Hồ sơ được gom theo buổi (chờ đợt chạy máy trung bình 1–3,5 giờ); công cụ tối ưu hóa chạy mất chưa tới 1 giây để gom nhóm và chọn sẵn gia sư có lịch trống khớp 100%. Quản lý chỉ mất 15–25 phút (0,2–0,45 giờ) kiểm tra và gửi xác nhận cho gia sư. Vì lịch rảnh của gia sư đã được lọc sẵn trên hệ thống nên gia sư xác nhận rất nhanh (1–3,5 giờ), chỉ có khoảng 8% trường hợp gia sư có việc đột xuất thì Quản lý chọn ngay phương án dự phòng số 2 mà máy đã gợi ý sẵn, không cần gọi làm phiền lại phụ huynh.
-
-### 5.4. Kết quả thực nghiệm (Trung bình qua 20 tháng mô phỏng độc lập = 1.200 hồ sơ)
-
-![So sánh 3 chỉ số KPI trọng tâm AS-IS và TO-BE](./fig1_as_is_vs_to_be_kpi.png)
-*Hình 3. Kết quả đối chiếu 3 chỉ số KPI cốt lõi giữa quy trình xếp tay hiện tại (AS-IS) và quy trình có công cụ gợi ý tối ưu (TO-BE).*
+Kết quả phân rã trên Hình 3.2 cho thấy chặng 2 (*Dò lịch, gom nhóm và chốt gia sư*) chiếm tới **69,4%** tổng thời gian chờ của học viên (15,66 giờ trên 22,56 giờ), trong khi chặng 1 của CSKH chỉ chiếm 8,6%. Điều này bác bỏ nhận định cảm tính rằng học viên chờ lâu là do CSKH gọi điện chậm; điểm nghẽn thực sự nằm ở vòng lặp nhắn tin chờ xác nhận thủ công và thời gian treo hồ sơ chờ gom đủ sĩ số nhóm.
 
 ![Phân rã thời gian chờ theo từng chặng](./fig2_waiting_time_breakdown.png)
-*Hình 4. So sánh thời gian chờ trung bình của học viên qua 3 chặng: (1) CSKH tư vấn, (2) Dò lịch & gom nhóm với gia sư, (3) Xếp buổi học thử.*
+*Hình 3.2. Phân rã thời gian chu trình trung bình (giờ làm việc) qua ba chặng của quy trình AS-IS so với TO-BE.*
 
-Nhìn vào hai biểu đồ trên, câu chuyện vận hành hiện ra rất thuyết phục:
+### 3.3 Phân tích hàng đợi và tình trạng tồn đọng
 
-**1. Tỷ lệ ghép lớp thành công tăng vọt từ 60,4% lên 92,7% (tăng thêm 32,3%)**
-- Với cách xếp tay từng người một (AS-IS), trung bình mỗi tháng có tới **23,75 trên 60 học viên bị tuột mất**, trong đó có 6,25 em rớt vì lệch lịch gia sư và tới **17,50 em rớt vì đăng ký lớp nhóm nhưng bị rải lẻ ra các ca chỉ có 1–2 người**, không đủ sĩ số tối thiểu 3 học viên để trung tâm mở lớp!
-- Khi áp dụng thu thập 1–3 khung giờ kết hợp công cụ gom nhóm tối ưu (TO-BE), máy tự động tìm "điểm chung" giữa các học sinh có 2–3 lựa chọn giờ học để **gom các em lại thành các nhóm đủ từ 3 đến 5 học viên**, đồng thời dành các gia sư đa năng cho những em có lịch khó. Nhờ vậy, số học viên bị rớt mỗi tháng giảm từ 23,75 em xuống chỉ còn **4,40 em/tháng** (giảm được **81,5% lượng khách hàng bị mất**).
+Để kiểm tra tải công việc của nhân sự và mức độ ứ đọng hồ sơ, nhóm áp dụng lý thuyết hàng đợi trên khung thời gian 240 giờ làm việc mỗi tháng (30 ngày × 8 giờ/ngày). Với nhu cầu trung bình 60 học viên/tháng, cường độ dòng hồ sơ đến là *λ* = 60 / 240 = 0,25 hồ sơ/giờ làm việc. Theo định luật Little [4], số lượng hồ sơ trung bình đang nằm chờ xử lý trong hệ thống tại một thời điểm bất kỳ (*L*) liên hệ trực tiếp với thời gian chu trình trung bình (*W*) qua công thức:
 
-**2. Sự đánh đổi rất thực tế ở Điểm độ phù hợp lịch học (KPI 2)**
-- Nếu chỉ tính riêng trong nhóm học viên đã được xếp lớp, điểm phù hợp lịch của cách làm mới là **93,3 điểm**, thấp hơn một chút so với cách xếp tay là **96,8 điểm** (chênh 3,5 điểm). **Vì sao lại như vậy?** Bởi vì ở cách làm cũ, những ca khó hoặc không gom đủ nhóm đều đã bị loại bỏ (rớt gần 40% số học viên), chỉ còn lại những ca dễ xếp ngay vào khung giờ số 1 (100 điểm). Còn ở phương án mới, để gom đủ nhóm 3–5 em và cứu thêm gần 20 học viên mỗi tháng, thuật toán đã khéo léo xếp một số bạn có lịch linh hoạt sang khung giờ ưu tiên số 2 (80 điểm) hoặc số 3 (60 điểm).
-- Khi tính **điểm phù hợp lịch trên toàn bộ 60 học viên đăng ký** (những em bị rớt tính 0 điểm), hiệu quả tổng thể của trung tâm tăng mạnh từ **58,5 điểm** lên **86,5 điểm** (+28 điểm).
+{{EQ:<i>L</i> = <i>λ</i> · <i>W</i> = 0,25 × 22,56 = 5,64 hồ sơ,&emsp;&emsp;<i>ρ</i><sub>QL</sub> = <span class="frac"><span class="num"><i>B</i><sub>QL</sub></span><span class="den"><i>s</i><sub>QL</sub> · <i>H</i></span></span> = 49,7%.|(3.1)}}
 
-**3. Thời gian chờ của học viên giảm hơn một nửa (từ 22,6 giờ xuống 10,3 giờ làm việc)**
-- Thời gian chờ trung bình để một học sinh nhận được lịch học giảm từ **22,6 giờ làm việc (gần 3 ngày)** xuống còn **10,3 giờ làm việc (hơn 1 ngày)** — tức là **rút ngắn 54,4% thời gian chờ**.
-- Với nhóm 10% hồ sơ khó nhất (chỉ số P90), thời gian chờ giảm từ **31,3 giờ (gần 4 ngày)** xuống chỉ còn **13,2 giờ (1,66 ngày)**. Tỷ lệ hồ sơ được giải quyết gọn trong vòng 2 ngày làm việc (≤ 16 giờ) tăng từ mức **18,0%** lên tới **99,3%**.
-- Đặc biệt, khi kiểm tra bằng **Định luật Little trong lý thuyết hàng đợi** *(Số hồ sơ đang tồn đọng = Tốc độ khách đến × Thời gian chờ trung bình)*:
-  > **Kiểm chứng bằng Định luật Little (với tốc độ đăng ký = 0,25 hồ sơ/giờ làm việc):**
-  > - **Hiện trạng (AS-IS):** 0,25 × 22,56 giờ = **5,64 hồ sơ** luôn nằm chờ xử lý trên bàn của đội ngũ tại mọi thời điểm.
-  > - **Cải tiến (TO-BE):** 0,25 × 10,29 giờ = **2,57 hồ sơ** đang xử lý (giảm hơn một nửa lượng việc tồn đọng).
-  > - **Giải phóng sức lao động cho Quản lý học vụ:** Tỷ lệ thời gian Quản lý phải cặm cụi dò lịch và nhắn Zalo giảm từ **49,7%** quỹ giờ làm việc xuống chỉ còn **8,7%** — giúp Quản lý rảnh tay để chăm lo chất lượng chuyên môn và hỗ trợ học viên.
+Trong đó *B*<sub>QL</sub> là tổng số giờ Quản lý trực tiếp thao tác dò lịch và nhắn tin trong tháng, *s*<sub>QL</sub> = 1 là số Quản lý học vụ, và *H* = 240 giờ. Kết quả cho thấy ở hiện trạng AS-IS, luôn có trung bình **5,64 hồ sơ** bị treo đồng thời trên bàn làm việc, và riêng việc dò lịch thủ công đã ngốn **49,7%** quỹ giờ làm việc của Quản lý học vụ (trong khi 2 nhân viên CSKH chỉ bận trung bình *ρ*<sub>CSKH</sub> = 13,7%). Đáng chú ý, nếu áp dụng công thức hàng đợi độc lập M/M/1 chỉ tính thời gian Quản lý ngồi thao tác (khoảng 1,3 giờ/lượt), thời gian chờ ước tính sẽ thấp hơn nhiều so với thực tế 22,56 giờ, bởi phần lớn độ trễ sinh ra từ thời gian chờ phản hồi bất đồng bộ trên Zalo và vòng lặp trả hồ sơ về CSKH khi lệch lịch.
 
-### 5.5. Phân tích Độ nhạy: Điều gì xảy ra khi điều kiện thực tế thay đổi?
-
-![Phân tích độ nhạy trên 3 chiều biến động](./fig3_sensitivity_analysis.png)
-*Hình 5. Thử nghiệm độ bền của giải pháp khi: (1) Lượng học viên tăng giảm, (2) Số lượng gia sư biến động, (3) Thay đổi số khung giờ mà CSKH hỏi phụ huynh.*
-
-Để chắc chắn giải pháp không chỉ đúng trên một bộ số liệu duy nhất, nhóm đã thử nghiệm thay đổi 3 yếu tố quan trọng nhất trong vận hành trung tâm:
-
-| Tình huống thử nghiệm | Khi thay đổi thông số | Xếp tay (AS-IS) | Có công cụ tối ưu (TO-BE) | Bài học rút ra cho quản lý trung tâm |
-| :--- | :---: | :---: | :---: | :--- |
-| **1. Khi lượng học sinh đăng ký thay đổi** *(giữ nguyên 10 gia sư)* | 45 học viên/tháng<br>60 học viên/tháng<br>75 học viên/tháng<br>90 học viên/tháng | 58,5%<br>64,6%<br>64,6%<br>65,3% | **87,0%**<br>**92,5%**<br>**91,6%**<br>**87,5%** | Khi ít học viên (45 em/tháng), việc gom đủ 3 em cùng cấp học vào 1 nhóm khó hơn lúc có 60 em. Khi tăng lên 90 em/tháng, Quản lý xếp tay bị quá tải nặng (bận tới 72,6% thời gian, chỉ 10,8% hồ sơ xong trong 2 ngày), trong khi quy trình mới vẫn giữ được 98,4% hồ sơ xong trước 2 ngày. |
-| **2. Khi trung tâm thiếu gia sư** *(giữ nguyên 60 học viên)* | Chỉ có 6 gia sư<br>Có 8 gia sư<br>Có 10 gia sư<br>Có 12 gia sư | 50,1%<br>56,3%<br>63,1%<br>62,2% | **75,3%**<br>**85,4%**<br>**93,9%**<br>**91,9%** | **Điểm rất đáng chú ý:** Ngay cả khi trung tâm bị thiếu người (chỉ có 6 gia sư), dùng công cụ tối ưu vẫn xếp được lớp cho **75,3%** học viên — cao hơn cả khi xếp bằng tay mà có tới 12 gia sư (62,2%). Nghĩa là điểm nghẽn chính nằm ở **cách gom nhóm và điều phối lịch**, chứ không phải cứ tuyển thêm gia sư là giải quyết được. |
-| **3. Khi thay đổi số khung giờ CSKH hỏi phụ huynh** | Chỉ hỏi 1 khung giờ<br>Hỏi tối đa 2 khung giờ<br>Hỏi tối đa 3 khung giờ | 60,8%<br>60,8%<br>60,8% | 58,3%<br>**87,8%**<br>**92,1%** | **Chìa khóa của toàn bộ dự án nằm ở đây:** Nếu CSKH vẫn giữ thói quen chỉ hỏi đúng 1 khung giờ duy nhất, thì dù có thuật toán hiện đại nhất cũng bó tay (chỉ ghép được 58,3% vì không có khoảng linh hoạt nào để gom các em vào chung nhóm). Nhưng chỉ cần CSKH hỏi được **2 đến 3 khung giờ khả dụng**, tỷ lệ ghép thành công vọt ngay lên **87,8% và 92,1%**! |
-
-### 5.6. Bài toán Cân bằng Lợi ích giữa Trung tâm và Học viên (Đường biên Pareto — Bài L5)
-
-![Đường biên Pareto và Kiểm định Trội Pareto](./fig4_pareto_tradeoff.png)
-*Hình 6. (A) Sự đánh đổi giữa Số ca lớp trung tâm phải mở và Tỷ lệ học viên được nhận lớp; (B) So sánh toàn diện cho thấy phương án cải tiến vượt trội hoàn toàn so với cách làm cũ.*
-
-Trong quản trị dịch vụ (Bài L5 — Trang 21–25), luôn có hai mong muốn trái chiều nhau: **Về phía người học**, ai cũng muốn được nhận vào lớp ngay ở khung giờ đẹp nhất; nhưng **về phía trung tâm**, mở quá nhiều lớp lẻ tẻ sẽ tốn nhiều ca dạy của gia sư và tăng chi phí vận hành.
-- **Ở Hình 6A (Đường biên đánh đổi Pareto):** Khi ban giám đốc muốn tiết kiệm số ca gia sư (tăng mức ưu tiên tiết kiệm chi phí γ từ 10 lên 1.065 và 1.085), công cụ sẽ tự động dồn học sinh vào các lớp nhóm 4–5 em và hạn chế mở lớp lẻ, giúp giảm số lớp phải mở từ **33,2 lớp** xuống **29,7 lớp** mà vẫn giữ được tỷ lệ ghép thành công trên **85,3%**. Nếu siết chi phí quá mức (γ = 1.105), máy sẽ cắt bỏ hoàn toàn các lớp 1–1 và chỉ mở đúng 8,9 lớp nhóm đông người (tỷ lệ ghép tụt xuống 50,7%). Nhờ biểu đồ này, ban giám đốc dễ dàng chọn được "điểm rơi" hợp lý nhất tùy theo ngân sách từng giai đoạn.
-- **Ở Hình 6B (Chứng minh tính vượt trội hoàn toàn):** Khi đặt cả hai tiêu chí chất lượng lên bàn cân là *Tỷ lệ ghép thành công* và *Điểm phù hợp lịch toàn hệ thống*, cách xếp tay hiện tại (chấm đỏ: 60,4% và 58,5 điểm) nằm thấp hơn hẳn về mọi mặt so với phương án mới khi thu thập từ 2 đến 3 khung giờ (87,8%–92,1% và 82,7–85,9 điểm).
+:::summary-box
+**Tóm tắt chẩn đoán**
+- Điểm nghẽn thời gian nằm ở **chặng dò lịch và thương lượng lại** (chiếm 69,4% tổng thời gian 22,56 giờ), khiến chỉ có 18,0% hồ sơ chốt xong trong 2 ngày làm việc và Quản lý mất 49,7% giờ làm cho thao tác thủ công.
+- Điểm nghẽn chất lượng nằm ở **hiệu ứng xé lẻ lớp nhóm**: khi chỉ hỏi 1 khung giờ và xếp tuần tự, trung bình **23,75 / 60 học viên (39,6%) bị rớt mỗi tháng**, trong đó tới 17,50 ca rớt vì lớp nhóm nháp chỉ gom được 1–2 em (dưới ngưỡng tối thiểu 3 học viên) và 6,25 ca rớt do lệch lịch gia sư.
+- Vì vậy, giải pháp can thiệp đúng trọng tâm là **mở rộng thông tin đầu vào lên 2–3 khung giờ ngay từ bước CSKH** kết hợp **mô hình tối ưu hóa gom cụm lớp nhóm theo đợt**.
+:::
 
 ---
 
-## 6. ĐỀ XUẤT PHƯƠNG ÁN CẢI TIẾN (TO-BE)
+## 4 Mô hình tối ưu ghép lớp và xếp lịch
 
-### 6.1. Nguyên tắc cải tiến: "Giữ con người làm chủ, dùng công nghệ làm trợ lý"
-Nhóm hoàn toàn đồng tình với định hướng vận hành thực tế của CatPlus: **không biến hệ thống thành cái máy tự động lạnh lùng đẩy khách hàng tự chọn lịch**. Phụ huynh đăng ký học lập trình thi đấu cho con vẫn cần được nhân viên CSKH trò chuyện, tư vấn lộ trình, và Quản lý học vụ vẫn phải là người cầm trịch quyết định cuối cùng xem thầy nào hợp tính với trò nào.
+### 4.1 Quy mô học viên, gia sư và dữ liệu nhu cầu
 
-Vì vậy, quy trình cải tiến (TO-BE) giữ nguyên sự tương tác ấm áp của con người, chỉ thay đổi **4 điểm trong cách thức phối hợp**:
-1. **CSKH hỏi 2–3 khung giờ ngay trong cuộc gọi đầu tiên:** Thay vì chỉ hỏi *"Cháu muốn học buổi nào?"*, CSKH sẽ hỏi theo mẫu chuẩn: *"Trong tuần có 2–3 buổi tối hoặc cuối tuần nào cháu có thể thu xếp học được để trung tâm chọn nhóm và gia sư tốt nhất cho cháu?"*, rồi tích chọn thứ tự ưu tiên 1, 2, 3 lên phần mềm.
-2. **Gia sư cập nhật sẵn các khung giờ trống hàng tuần trên hệ thống:** Thay vì mỗi lần có học sinh mới Quản lý lại phải nhắn Zalo hỏi từng thầy, các gia sư chỉ cần đánh dấu lịch rảnh cố định của mình trên web vào đầu tuần (hoặc đầu tháng).
-3. **Phần mềm tự động gom nhóm và gợi ý phương án ghép tốt nhất:** Hai lần mỗi ngày (ví dụ 11h30 trưa và 17h30 chiều), hệ thống tự động gom các hồ sơ đang chờ lớp, chạy công cụ tối ưu hóa (chỉ mất chưa tới 1 giây) để đưa ra bảng đề xuất: những em nào gom vào chung một lớp nhóm đủ 3–5 người, em nào ghép 1–1 với gia sư nào.
-4. **Quản lý học vụ duyệt 1 chạm và có sẵn phương án dự phòng:** Quản lý xem bảng gợi ý của máy, nếu thấy hợp lý thì bấm duyệt để gửi thông báo cho gia sư xác nhận. Trong trường hợp hãn hữu (khoảng 8%) gia sư báo bận đột xuất, màn hình Quản lý đã có sẵn **phương án gợi ý tốt số 2** để chuyển ngay trong 5 phút mà không phải gọi điện làm phiền lại phụ huynh.
+Nhóm thiết lập bài toán cho một chu kỳ tuyển sinh tiêu chuẩn gồm *N* = 60 học viên đăng ký và *M* = 10 gia sư trên lưới 14 khung giờ học cố định hàng tuần (10 ca buổi tối từ thứ Hai đến thứ Sáu lúc 18h00 và 19h45; 4 ca sáng, chiều, tối thứ Bảy và Chủ nhật). Phân bố nhu cầu phản ánh đặc thù thực tế của học sinh phổ thông: các ca buổi tối cuối tuần và ca 19h45 có xác suất được chọn cao hơn ca 18h00 đầu tuần.
 
-### 6.2. Sơ đồ quy trình BPMN 2.0 sau cải tiến (TO-BE)
-- **Tệp BPMN 2.0 gốc (mở trên https://demo.bpmn.io/new):** [catplus_matching_to_be.bpmn](./catplus_matching_to_be.bpmn)
+Trong 60 học viên, 55% thuộc cấp THCS và 45% thuộc cấp THPT; 40% đăng ký học kèm 1–1 (sĩ số bắt buộc bằng 1) và 60% đăng ký học nhóm (sĩ số bắt buộc từ 3 đến 5 học viên cùng cấp học). Về độ linh hoạt thời gian, 20% học viên có lịch rất hẹp (chỉ thu xếp được đúng 1 khung giờ trong tuần), 45% thu xếp được 2 khung giờ và 35% linh hoạt được 3 khung giờ. Về phía nguồn cung, 50% gia sư dạy được cả hai cấp THCS và THPT, 30% chuyên THCS và 20% chuyên THPT; mỗi gia sư có từ 5 đến 7 khung giờ trống mỗi tuần và nhận dạy tối đa *K*<sub>*t*</sub> ∈ {3, 4, 5} lớp để bảo đảm chất lượng giảng dạy.
+
+### 4.2 Khung giờ học và hàm điểm phù hợp lịch
+
+Mỗi học viên *i* ∈ *I* = {1, ..., *N*} cung cấp danh sách tối đa *m* khung giờ khả dụng *S*<sub>*i*</sub> ⊂ {1, ..., 14} (*m* = 1 ở lần hỏi đầu của AS-IS; *m* ≤ 3 ở TO-BE). Để lượng hóa mức độ thuận tiện cho gia đình người học, nhóm gán điểm phù hợp *w*<sub>*i*,*s*</sub> = 100 nếu học viên *i* được xếp đúng khung giờ ưu tiên số 1, *w*<sub>*i*,*s*</sub> = 80 cho khung giờ ưu tiên số 2, *w*<sub>*i*,*s*</sub> = 60 cho khung giờ ưu tiên số 3 và 0 điểm nếu không xếp được lớp. Gọi *I*<sub>ghép</sub> ⊆ *I* là tập học viên được xếp lớp thành công và *s*(*i*) là khung giờ được gán, hai chỉ số độ phù hợp lịch được tính tường minh theo công thức:
+
+{{EQ:Fit<sub>ghép</sub> = <span class="frac"><span class="num">1</span><span class="den">|<i>I</i><sub>ghép</sub>|</span></span> ∑<sub><i>i</i> ∈ <i>I</i><sub>ghép</sub></sub> <i>w</i><sub><i>i</i>, <i>s</i>(<i>i</i>)</sub>,&emsp;&emsp;Fit<sub>chung</sub> = <span class="frac"><span class="num">1</span><span class="den"><i>N</i></span></span> ∑<sub><i>i</i> = 1</sub><sup><i>N</i></sup> <i>w</i><sub><i>i</i>, <i>s</i>(<i>i</i>)</sub>.|(4.1)}}
+
+Việc tách đôi Fit<sub>ghép</sub> và Fit<sub>chung</sub> giúp tránh ngộ nhận khi so sánh: một phương án loại bỏ hết các học viên khó xếp lịch có thể đạt Fit<sub>ghép</sub> rất cao trên số ít học viên còn lại, nhưng lại làm Fit<sub>chung</sub> của toàn trung tâm tụt thấp.
+
+### 4.3 Mô hình phân công ghép đôi và gom nhóm (MILP)
+
+Bảng 4.1 tóm tắt năm yếu tố cấu thành bài toán tối ưu hóa theo phương pháp luận của Daskin [5]. Gọi *K* là tập tất cả các cặp `(gia sư t, khung giờ s)` mà gia sư *t* còn trống lịch, được đánh chỉ số *k* ∈ *K*, và *C* = {(THCS, 1–1), (THPT, 1–1), (THCS, Nhóm), (THPT, Nhóm)} là tập 4 cấu hình lớp học hợp lệ. Với mỗi cấu hình *c* ∈ *C*, ngưỡng sĩ số tối thiểu và tối đa được ký hiệu là (*L*<sub>*c*</sub>, *U*<sub>*c*</sub>), nhận giá trị (1, 1) đối với lớp 1–1 và (3, 5) đối với lớp nhóm.
+
+**Bảng 4.1.** Năm yếu tố của bài toán tối ưu ghép đôi và xếp lịch học
+
+| Yếu tố | Trong đề tài CatPlus |
+| :--- | :--- |
+| Dữ liệu đầu vào | Tập *N* = 60 học viên (cấp học, hình thức 1–1/Nhóm, 1–3 khung giờ rảnh kèm điểm *w*<sub>*i*,*k*</sub> ∈ {100, 80, 60}); *M* = 10 gia sư (cấp dạy được, 5–7 ca trống, trần số lớp *K*<sub>*t*</sub>) |
+| Biến quyết định | *x*<sub>*i*,*k*</sub> ∈ {0, 1} gán học viên *i* vào ca *k*; *y*<sub>*k*,*c*</sub> ∈ {0, 1} mở lớp cấu hình *c* tại ca *k*; *u*<sub>*i*</sub> ∈ {0, 1} đưa học viên *i* vào "lớp ảo" chưa ghép được |
+| Hàm mục tiêu | Cực tiểu hóa tổng điểm phạt học viên rớt (*P* · *u*<sub>*i*</sub>) trừ tổng điểm phù hợp lịch (*w*<sub>*i*,*k*</sub> · *x*<sub>*i*,*k*</sub>) cộng chi phí mở lớp (*γ* · *y*<sub>*k*,*c*</sub>) |
+| Ràng buộc cứng | Mỗi học viên nhận tối đa 1 ca; mỗi ca gia sư mở tối đa 1 lớp; lớp nhóm phải đủ từ 3 đến 5 học viên; không vượt số lớp tối đa *K*<sub>*t*</sub> của từng gia sư |
+| Phân tích độ nhạy | Lượng học viên *N* ∈ {45, 60, 75, 90}; số gia sư *M* ∈ {6, 8, 10, 12}; số khung giờ thu thập *m* ∈ {1, 2, 3}; chi phí mở lớp *γ* ∈ [10, 1105] |
+
+Để mô hình luôn có nghiệm khả thi ngay cả khi nhu cầu vượt quá năng lực phục vụ, nhóm bổ sung biến nhị phân "lớp ảo" *u*<sub>*i*</sub> ∈ {0, 1} với mức phạt lớn *P* = 1.000 cho mỗi học viên chưa xếp được lớp (theo kỹ thuật xử lý ràng buộc mềm bằng chi phí phạt ở Bài L5). Bài toán quy hoạch nguyên hỗn hợp (MILP) tìm nghiệm cực tiểu của hàm mục tiêu đa mục tiêu có trọng số:
+
+{{EQ:min <i>Z</i> = ∑<sub><i>i</i> ∈ <i>I</i></sub> <i>P</i> · <i>u<sub>i</sub></i> − ∑<sub><i>i</i> ∈ <i>I</i></sub> ∑<sub><i>k</i> ∈ <i>K<sub>i</sub></i></sub> <i>w<sub>i,k</sub></i> · <i>x<sub>i,k</sub></i> + <i>γ</i> ∑<sub><i>k</i> ∈ <i>K</i></sub> ∑<sub><i>c</i> ∈ <i>C</i></sub> <i>y<sub>k,c</sub></i>|(4.2)}}
+
+thỏa mãn bốn hệ ràng buộc tuyến tính nguyên sau:
+
+{{EQ:∑<sub><i>k</i> ∈ <i>K<sub>i</sub></i></sub> <i>x<sub>i,k</sub></i> + <i>u<sub>i</sub></i> = 1,&emsp;&emsp;∀<i>i</i> ∈ <i>I</i>,|(4.3)}}
+
+{{EQ:∑<sub><i>c</i> ∈ <i>C</i></sub> <i>y<sub>k,c</sub></i> ≤ 1,&emsp;&emsp;∀<i>k</i> ∈ <i>K</i>,&emsp;&emsp;&emsp;∑<sub><i>k</i> ∈ <i>K</i>(<i>t</i>)</sub> ∑<sub><i>c</i> ∈ <i>C</i></sub> <i>y<sub>k,c</sub></i> ≤ <i>K<sub>t</sub></i>,&emsp;&emsp;∀<i>t</i> ∈ <i>T</i>,|(4.4)}}
+
+{{EQ:<i>L<sub>c</sub></i> · <i>y<sub>k,c</sub></i> ≤ ∑<sub><i>i</i> ∈ <i>I</i>(<i>k,c</i>)</sub> <i>x<sub>i,k</sub></i> ≤ <i>U<sub>c</sub></i> · <i>y<sub>k,c</sub></i>,&emsp;&emsp;∀<i>k</i> ∈ <i>K</i>, ∀<i>c</i> ∈ <i>C</i>,&emsp;&emsp;<i>x<sub>i,k</sub></i>, <i>y<sub>k,c</sub></i>, <i>u<sub>i</sub></i> ∈ {0, 1}.|(4.5)}}
+
+Ràng buộc (4.3) bảo đảm mỗi học viên hoặc được xếp vào đúng một ca dạy tương thích, hoặc được đánh dấu *u*<sub>*i*</sub> = 1 để Quản lý chủ động xử lý ngoại lệ. Ràng buộc (4.4) ngăn một gia sư dạy hai lớp trùng giờ và giữ tổng số lớp của gia sư *t* không vượt trần *K*<sub>*t*</sub>. Đặc biệt, bất đẳng thức hai đầu (4.5) thể hiện chính xác quy định mở lớp của trung tâm: với lớp nhóm (*L*<sub>*c*</sub> = 3, *U*<sub>*c*</sub> = 5), nếu một khung giờ chỉ có 1 hoặc 2 học viên tương thích thì vế trái `3 · y ≤ ∑ x` buộc *y*<sub>*k*,*c*</sub> = 0 (không được mở lớp nhóm thiếu người), từ đó thúc đẩy bộ giải tự động dịch chuyển các học viên có 2–3 khung giờ rảnh về chung một ca để vượt ngưỡng 3 học viên. Ở cấu hình mặc định, nhóm đặt *γ* = 0,05 để ưu tiên tối đa số học viên vào lớp trước khi gom gọn số ca mở.
+
+### 4.4 Giả định và cách kiểm tra
+
+Bảng 4.2 liệt kê các giả định chính được sử dụng trong mô hình tối ưu hóa – mô phỏng và cách nhóm kiểm chứng độ bền của từng giả định trước khi đưa ra khuyến nghị.
+
+**Bảng 4.2.** Giả định của mô hình và cách nhóm kiểm tra
+
+| Giả định trong mô hình | Cách nhóm kiểm tra và đối chứng |
+| :--- | :--- |
+| Nhu cầu cơ sở *N* = 60 học viên/tháng và *M* = 10 gia sư | Thử nghiệm độ nhạy *N* ∈ {45, 60, 75, 90} và *M* ∈ {6, 8, 10, 12} (Mục 6.3) |
+| Phụ huynh cung cấp tối đa 3 khung giờ khi CSKH hỏi kỹ | Đối chứng cố định cùng tập học viên với *m* ∈ {1, 2, 3} khung giờ (Bảng 6.3) |
+| Gia sư cập nhật đúng khung giờ trống trên hệ thống | Bổ sung tỷ lệ 8% gia sư bận đột xuất trong mô phỏng SimPy để kiểm tra bước dự phòng |
+| Xếp tay AS-IS có bước Quản lý cố gắng ghép vớt nhóm thiếu người | Lập trình hàm AS-IS có vòng cứu vớt thủ công sang các nhóm hợp lệ còn chỗ (< 5 người) |
+| Ưu tiên tối đa tỷ lệ nhận lớp (*P* = 1.000, *γ* = 0,05) | Quét *γ* ∈ {10, 1065, 1085, 1105} để dựng đường biên đánh đổi Pareto (Mục 6.2) |
+
+---
+
+## 5 Triển khai tính toán và kết quả chạy
+
+### 5.1 Chuỗi xử lý
+
+Toàn bộ kết quả định lượng và hình vẽ trong báo cáo được sinh tự động bằng các tệp mã Python trong thư mục `du_an_nhom20/`, không chỉnh sửa tay bất kỳ con số nào. Bảng 5.1 trình bày các bước trong chuỗi xử lý và kết quả chạy thực tế.
+
+**Bảng 5.1.** Các bước của chuỗi xử lý, việc thực hiện và kết quả chính của lần chạy gần nhất
+
+| Tệp mã | Việc thực hiện | Kết quả chạy |
+| :--- | :--- | :--- |
+| `export_real_data_template.py` | Trích xuất ẩn danh trạng thái hồ sơ, lịch lớp và nhật ký chuyển chặng từ DB thật | Xuất 4 tệp CSV sạch thông tin cá nhân khi nạp dữ liệu máy chủ |
+| `CatPlus_Sim_Opt_Model.py` | Sinh 20 chu kỳ tháng (`seed = 42`), giải AS-IS, giải MILP bằng HiGHS và mô phỏng SimPy | *R*<sub>ghép</sub> tăng từ 60,4% lên 92,7%; *W* giảm từ 22,56h xuống 10,29h |
+| `CatPlus_Sim_Opt_Model.py` *(độ nhạy & Pareto)* | Chạy 11 kịch bản độ nhạy (*N*, *M*, *m*) và quét 4 mức chi phí mở lớp *γ* | Xuất `simulation_results.json` và 4 biểu đồ `fig1`..`fig4` |
+| `draw_resource_map.py` | Dựng sơ đồ Bản đồ nguồn lực và cơ chế đồng tạo giá trị (Hình 2.1) | Xuất `fig0_resource_map.png` (220 DPI) |
+| `draw_bpmn_diagrams.py` | Kết xuất trực quan hai sơ đồ Swimlane BPMN 2.0 khớp với tệp `.bpmn` | Xuất `fig_bpmn_as_is.png` và `fig_bpmn_to_be.png` |
+| `build_preview_docs.py` | Đồng bộ số liệu, tự động đánh số trang Mục lục và xuất HTML, PDF, Word | Hoàn tất trọn bộ báo cáo định dạng chuẩn học thuật |
+
+Về mặt kỹ thuật, nhóm phát biểu bài toán (4.2)–(4.5) dưới dạng ma trận thưa (`scipy.sparse.coo_matrix`) và giải trực tiếp bằng bộ giải quy hoạch nguyên **HiGHS** tích hợp trong `scipy.optimize.milp` [6], kết hợp thư viện mô phỏng sự kiện rời rạc `simpy` [7]. Mỗi bài toán tháng (60–90 học viên, khoảng 350 biến nhị phân) đều hội tụ về nghiệm tối ưu toàn cục trong dưới 0,5 giây trên máy tính cá nhân.
+
+### 5.2 Trích mã nguồn và nhật ký chạy
+
+Đoạn mã dưới đây trích phần thiết lập ràng buộc sĩ số hai đầu (4.5) và lời gọi bộ giải HiGHS trong tệp `du_an_nhom20/CatPlus_Sim_Opt_Model.py`, khớp trực tiếp với mô hình toán ở Mục 4.3:
+
+```python
+# Trich tu du_an_nhom20/CatPlus_Sim_Opt_Model.py (ham solve_to_be_milp)
+for (k, tid, slot, lvl, mode, l_cap, u_cap) in y_vars:
+    yi = y_index[(k, lvl, mode)]
+    compat_x = [x_index[(i, k)] for i, s in enumerate(students)
+                if (i, k) in x_index and s["level"] == lvl and s["mode"] == mode]
+    if compat_x:
+        # Rang buoc can tren: sum(x_ik) - U_c * y_kc <= 0
+        rows.extend([row_idx] * (len(compat_x) + 1))
+        cols.extend(compat_x + [yi])
+        vals.extend([1.0] * len(compat_x) + [-float(u_cap)])
+        lbs.append(-np.inf); ubs.append(0.0); row_idx += 1
+        # Rang buoc can duoi nhom (quorum >= 3): sum(x_ik) - L_c * y_kc >= 0
+        if l_cap > 1:
+            rows.extend([row_idx] * (len(compat_x) + 1))
+            cols.extend(compat_x + [yi])
+            vals.extend([1.0] * len(compat_x) + [-float(l_cap)])
+            lbs.append(0.0); ubs.append(np.inf); row_idx += 1
+
+A = coo_matrix((vals, (rows, cols)), shape=(row_idx, total_vars)).tocsc()
+res = milp(c=c_obj, integrality=np.ones(total_vars),
+           bounds=Bounds(0, 1), constraints=LinearConstraint(A, lbs, ubs),
+           options={"time_limit": 2.5, "mip_rel_gap": 0.005})
+```
+
+Khung dưới đây trích kết quả chạy thực tế từ tệp nhật ký tổng hợp `du_an_nhom20/simulation_results.json` khi chạy lệnh `uv run python du_an_nhom20/CatPlus_Sim_Opt_Model.py`:
+
+```text
+> uv run --with simpy --with scipy --with matplotlib python du_an_nhom20/CatPlus_Sim_Opt_Model.py
+Running strict coupled baseline simulation (20 replications, N=60, M=10)...
+Done! Baseline summary:
+  [AS-IS] match_rate = 60.42% (±8.71%) | fit_matched = 96.75 | fit_all = 58.45
+          wait_mean  = 22.56h (2.82d)  | P90 = 31.29h | SLA_16h = 18.00%
+          rho_mgr    = 49.67% | WIP L  = 5.64 cases | lost = 23.75 (group_quorum: 17.50)
+  [TO-BE] match_rate = 92.67% (±4.36%) | fit_matched = 93.28 | fit_all = 86.45
+          wait_mean  = 10.29h (1.29d)  | P90 = 13.24h | SLA_16h = 99.25%
+          rho_mgr    =  8.67% | WIP L  = 2.57 cases | lost =  4.40 (-81.5% closed_lost)
+```
+
+---
+
+## 6 Kết quả so sánh các phương án
+
+### 6.1 So sánh AS-IS và TO-BE
+
+Bảng 6.1 và Hình 6.1 đối chiếu phương án xếp tay hiện tại (AS-IS) với ba cấu hình của phương án TO-BE khi CSKH thu thập tối đa 1, 2 hoặc 3 khung giờ rảnh từ phụ huynh trên cùng tập nhu cầu.
+
+**Bảng 6.1.** So sánh phương án cơ sở (AS-IS) và các cấu hình TO-BE (*N* = 60 học viên/tháng, *M* = 10 gia sư)
+
+| Phương án | *R*<sub>ghép</sub> (%) | *N*<sub>rớt</sub> (ca/tháng) | Fit<sub>ghép</sub> (điểm) | Fit<sub>chung</sub> (điểm) | *W* TB (giờ) | P90 (giờ) | SLA<sub>16h</sub> (%) |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| AS-IS (xếp tay tuần tự) | 60,4 | 23,75 | 96,8 | 58,5 | 22,56 | 31,29 | 18,0 |
+| TO-BE (MILP, chỉ hỏi 1 khung giờ) | 58,3 | 25,00 | 100,0 | 58,3 | 9,69 | 12,84 | 99,0 |
+| TO-BE (MILP, hỏi tối đa 2 khung giờ) | 87,8 | 7,33 | 94,2 | 82,7 | 10,21 | 13,23 | 98,8 |
+| **TO-BE (MILP, hỏi tối đa 3 khung giờ — đề xuất)** | **92,7** | **4,40** | **93,3** | **86,5** | **10,29** | **13,24** | **99,3** |
+
+Bảng 6.1 làm sáng tỏ một phát hiện quản trị rất quan trọng: nếu CSKH chỉ hỏi đúng 1 khung giờ duy nhất rồi đưa vào thuật toán MILP (*TO-BE 1 khung giờ*), tỷ lệ ghép lớp chỉ đạt **58,3%** — không hơn gì cách xếp tay (60,4%), dù thời gian xử lý giảm nhờ bỏ vòng hỏi lại. Nguyên nhân là khi mỗi học sinh chỉ có 1 lựa chọn cố định, máy tính cũng không có khoảng linh hoạt nào để dồn các học sinh học nhóm về chung một ca đủ 3 người. Ngược lại, ngay khi CSKH khai thác được tối đa **2 khung giờ**, tỷ lệ ghép vọt lên **87,8%**, và đạt **92,7%** khi hỏi tối đa **3 khung giờ** (giảm lượng học viên rớt từ 23,75 xuống còn 4,40 em/tháng, tức giảm **81,5%**). Độ lệch chuẩn giữa các tháng cũng giảm một nửa (từ 8,7% xuống 4,4%), giúp doanh thu và lịch mở lớp của trung tâm ổn định hơn rõ rệt.
+
+![So sánh ba chỉ số KPI trọng tâm giữa AS-IS và TO-BE](./fig1_as_is_vs_to_be_kpi.png)
+*Hình 6.1. Đối chiếu ba chỉ số KPI cốt lõi giữa quy trình xếp tay hiện tại (AS-IS) và cấu hình đề xuất TO-BE (thu thập 1–3 khung giờ kết hợp gợi ý MILP).*
+
+Về độ phù hợp lịch, Fit<sub>ghép</sub> của cấu hình đề xuất đạt 93,3 điểm, thấp hơn 3,5 điểm so với AS-IS (96,8 điểm) vì mô hình chủ động xếp một số học viên linh hoạt sang khung giờ ưu tiên số 2 (80 điểm) hoặc số 3 (60 điểm) để gom đủ nhóm 3–5 học viên và nhường ca hiếm cho các bạn chỉ rảnh 1 buổi. Đổi lại, điểm phù hợp tính trên toàn bộ khách đăng ký (Fit<sub>chung</sub>) tăng mạnh từ **58,5 lên 86,5 điểm** (+28,0 điểm). Đồng thời, thời gian chờ trung bình giảm **54,4%** (từ 22,56 xuống 10,29 giờ làm việc), nâng tỷ lệ hồ sơ chốt xong trong 2 ngày làm việc từ **18,0% lên 99,3%**.
+
+### 6.2 Đánh đổi đa mục tiêu và đường biên Pareto
+
+Trong thực tế vận hành, trung tâm luôn đứng trước sự đánh đổi giữa chất lượng phục vụ người học (tăng tỷ lệ nhận lớp) và chi phí nguồn lực nhà cung cấp (giảm số ca lớp gia sư phải mở). Bảng 6.2 và Hình 6.2a khảo sát đường biên Pareto bằng cách quét trọng số chi phí mở lớp *γ* trong hàm mục tiêu (4.2) từ 10 đến 1.105 (với *P* = 1.000).
+
+**Bảng 6.2.** Đường biên đánh đổi Pareto giữa số ca gia sư phải mở và tỷ lệ ghép thành công khi thay đổi *γ*
+
+| Trọng số chi phí mở lớp *γ* | Số ca lớp mở TB / tháng | *R*<sub>ghép</sub> (%) | Fit<sub>chung</sub> (điểm) | Ý nghĩa vận hành tương ứng với cấu hình nghiệm |
+| :---: | :---: | :---: | :---: | :--- |
+| *γ* = 10 | 33,25 | 91,3 | 84,9 | Mở tối đa cả lớp nhóm và lớp 1–1 ở mọi mức ưu tiên 1, 2, 3 |
+| *γ* = 1.065 | 32,17 | 89,4 | 84,1 | Ngừng mở các lớp lẻ 1–1 rơi vào khung giờ ưu tiên 3 (*P* + 60 = 1.060 < *γ*) |
+| *γ* = 1.085 | 29,67 | 85,3 | 80,7 | Chỉ mở lớp 1–1 nếu đạt ưu tiên 1; dồn tối đa học sinh vào các nhóm 4–5 người |
+| *γ* = 1.105 | 8,92 | 50,7 | 46,1 | Ngừng mở hoàn toàn lớp 1–1 (*P* + 100 < *γ*); chỉ mở các lớp nhóm đông người |
+
+Kết quả trên Bảng 6.2 minh họa rõ đặc tính "bước nhảy nghiệm nguyên": khi *γ* vượt qua ngưỡng lợi ích của một ca kèm 1–1 ở ưu tiên 3 (1.060), ưu tiên 2 (1.080) và ưu tiên 1 (1.100), cấu hình lớp mở thay đổi theo từng nấc rõ rệt. Ở mức *γ* = 1.085, trung tâm tiết kiệm được 3,6 ca gia sư mỗi tháng so với *γ* = 10 mà vẫn duy trì tỷ lệ ghép trên 85%. Trong khi đó, trên không gian hai mục tiêu chất lượng (Hình 6.2b), phương án xếp tay AS-IS (60,4%; 58,5 điểm) bị trội hoàn toàn (dominated) bởi cả hai cấu hình TO-BE 2 khung giờ và 3 khung giờ.
+
+![Đường biên Pareto và kiểm định trội Pareto](./fig4_pareto_tradeoff.png)
+*Hình 6.2. (a) Đường biên Pareto đánh đổi giữa số ca lớp gia sư phải mở và tỷ lệ ghép thành công; (b) Kiểm định trội Pareto giữa AS-IS và các cấu hình TO-BE.*
+
+### 6.3 Độ ổn định và phân tích độ nhạy
+
+Nhóm kiểm tra độ bền của khoảng cách cải thiện giữa TO-BE và AS-IS qua 11 kịch bản biến động nhu cầu, nhân sự gia sư và số khung giờ thu thập (Bảng 6.3 và Hình 6.3).
+
+**Bảng 6.3.** Tỷ lệ ghép thành công (%) và hiệu số cải thiện (điểm %) theo các kịch bản độ nhạy
+
+| Nhóm tham số khảo sát | Giá trị thử nghiệm | AS-IS (%) | TO-BE (%) | Hiệu số TO-BE − AS-IS | Tỷ lệ bận Quản lý *ρ*<sub>QL</sub> (AS-IS → TO-BE) |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| Lượng học viên *N* (*M* = 10) | 45 hồ sơ/tháng | 58,5 | 87,0 | +28,5 | 37,2% → 6,6% |
+| Lượng học viên *N* (*M* = 10) | 60 hồ sơ/tháng (gốc) | 64,6 | 92,5 | +27,9 | 48,0% → 8,5% |
+| Lượng học viên *N* (*M* = 10) | 75 hồ sơ/tháng | 64,6 | 91,6 | +27,0 | 62,4% → 10,7% |
+| Lượng học viên *N* (*M* = 10) | 90 hồ sơ/tháng | 65,3 | 87,5 | +22,2 | 72,6% → 12,8% |
+| Số gia sư *M* (*N* = 60) | 6 gia sư (thiếu hụt) | 50,1 | 75,3 | +25,2 | 54,8% → 8,5% |
+| Số gia sư *M* (*N* = 60) | 8 gia sư | 56,3 | 85,4 | +29,1 | 52,3% → 8,6% |
+| Số gia sư *M* (*N* = 60) | 10 gia sư | 63,1 | 93,9 | +30,8 | 47,8% → 8,5% |
+| Số gia sư *M* (*N* = 60) | 12 gia sư | 62,2 | 91,9 | +29,7 | 48,0% → 8,5% |
+| Số khung giờ hỏi tối đa *m* | *m* = 1 khung giờ | 60,8 | 58,3 | −2,5 | 49,4% → 8,5% |
+| Số khung giờ hỏi tối đa *m* | *m* = 2 khung giờ | 60,8 | 87,8 | +27,0 | 49,4% → 8,5% |
+| Số khung giờ hỏi tối đa *m* | *m* = 3 khung giờ | 60,8 | 92,1 | +31,3 | 49,4% → 8,5% |
+
+Trong mọi kịch bản có thu thập từ 2 khung giờ trở lên, phương án TO-BE đều vượt AS-IS từ **+22,2 đến +31,3 điểm phần trăm**. Có hai hiện tượng thực tiễn rất đáng lưu ý trên Hình 6.3: thứ nhất, khi lượng đăng ký thấp (*N* = 45), tỷ lệ ghép của cả hai phương án đều thấp hơn mức *N* = 60 vì lượng học sinh thưa làm giảm xác suất có đủ 3 em trùng cấp học và khung giờ để mở lớp nhóm; khi nhu cầu tăng lên *N* = 90, tỷ lệ bận của Quản lý ở AS-IS vọt lên **72,6%** (tỷ lệ đạt chuẩn 2 ngày sụp xuống còn 10,8%), trong khi TO-BE vẫn giữ *ρ*<sub>QL</sub> ở mức nhẹ nhàng 12,8%. Thứ hai, ngay cả khi trung tâm chỉ còn **6 gia sư**, mô hình MILP vẫn ghép được **75,3%** học viên — cao hơn cả khi xếp bằng tay mà có tới **12 gia sư** (62,2%). Điều này khẳng định nút thắt nằm ở cơ chế gom nhóm hơn là thiếu hụt nhân sự đơn thuần.
+
+![Phân tích độ nhạy trên ba chiều biến động](./fig3_sensitivity_analysis.png)
+*Hình 6.3. Phân tích độ nhạy của tỷ lệ ghép thành công theo lượng học viên, số gia sư và số khung giờ thu thập.*
+
+---
+
+## 7 Đề xuất cải tiến (TO-BE)
+
+### 7.1 Thay đổi trong quy trình
+
+Phương án TO-BE giữ nguyên đội ngũ nhân sự (2 CSKH, 1 Quản lý học vụ, 10 gia sư) và tôn trọng triết lý lấy con người làm chủ của CatPlus: CSKH vẫn trực tiếp trò chuyện tư vấn với phụ huynh, và Quản lý học vụ vẫn là người kiểm duyệt cuối cùng trước khi mở lớp. Quy trình chỉ thay đổi ở ba điểm cốt lõi (Hình 7.1): (i) CSKH khai thác và nhập chuẩn hóa **1–3 khung giờ ưu tiên** của học sinh ngay trong cuộc gọi đầu tiên; (ii) Gia sư đánh dấu sẵn các ca trống cố định hằng tuần trên hệ thống; và (iii) Hệ thống tự động chạy mô hình MILP theo hai đợt mỗi ngày (11h30 và 17h30) để đề xuất danh sách ghép lớp tối ưu kèm phương án dự phòng cho Quản lý duyệt trong 1 vòng.
 
 ![Sơ đồ BPMN 2.0 quy trình TO-BE](./fig_bpmn_to_be.png)
-*Hình 7. Sơ đồ quy trình BPMN 2.0 cải tiến (TO-BE): Vòng lặp hỏi đi hỏi lại với phụ huynh đã được loại bỏ nhờ bước thu thập 1–3 khung giờ và công cụ gợi ý ghép lớp tự động.*
+*Hình 7.1. BPMN TO-BE của quy trình ghép đôi – xếp lịch có module MILP hỗ trợ ra quyết định (tệp chuẩn: `catplus_matching_to_be.bpmn`).*
 
-### 6.3. Tính khả thi và những đánh đổi cần lưu ý khi triển khai
-- **Rất dễ áp dụng ngay vào hệ thống hiện tại:** Toàn bộ phần mềm CatPlus đang được viết bằng ngôn ngữ Python (Django). Bộ giải tối ưu hóa mà nhóm xây dựng cũng chạy trực tiếp trên Python chuẩn mà không cần mua thêm bất kỳ phần mềm đắt tiền hay nâng cấp máy chủ nào.
-- **Hai sự đánh đổi nhỏ hoàn toàn chấp nhận được:**
-  - *Thứ nhất:* Cuộc gọi tư vấn đầu tiên của CSKH sẽ dài thêm khoảng 3–5 phút để hỏi kỹ 2–3 khung giờ rảnh của gia đình, nhưng đổi lại CSKH không phải gọi đi gọi lại lần 2, lần 3 để xin đổi giờ.
-  - *Thứ hai:* Thay vì xử lý lẻ tẻ ngay tức khắc từng hồ sơ, hệ thống gom hồ sơ theo buổi (nửa ngày chạy gợi ý một lần) để gom đủ sĩ số lớp nhóm 3–5 em. Dù có thêm 1–3 giờ chờ gom đợt, tổng thời gian từ lúc đăng ký đến lúc chốt xong lịch vẫn giảm hơn một nửa (từ gần 3 ngày xuống còn hơn 1 ngày).
+Bảng 7.1 quy định quy tắc ra quyết định cụ thể cho Quản lý học vụ khi xử lý bảng đề xuất từ phần mềm.
+
+**Bảng 7.1.** Bảng quyết định xử lý của Quản lý học vụ sau mỗi đợt chạy gợi ý MILP
+
+| Tình huống trên bảng gợi ý của hệ thống | Hành động của Quản lý học vụ |
+| :--- | :--- |
+| Học viên được gợi ý vào lớp 1–1 hoặc nhóm đủ 3–5 em, gia sư xác nhận | Bấm duyệt tạo lớp học thử/chính thức; chuyển CSKH báo lịch chốt cho phụ huynh |
+| Gia sư được gợi ý chính báo bận đột xuất (khoảng 8% trường hợp) | Chọn ngay phương án dự phòng số 2 trên màn hình mà không cần gọi hỏi lại phụ huynh |
+| Nhóm gợi ý mới gom được 2 học viên có lịch rảnh trùng nhau | Giữ chờ thêm tối đa 1 đợt chạy kế tiếp (nửa ngày); nếu chưa đủ 3 em thì tư vấn chuyển sang 1–1 |
+| Học viên rơi vào biến lớp ảo (*u*<sub>*i*</sub> = 1, lịch quá hẹp) | Nhận cảnh báo sớm ngay trong ngày đầu để CSKH chủ động thương lượng mở rộng khung giờ |
+
+### 7.2 Lựa chọn cấu hình và lộ trình triển khai
+
+Nhóm đề xuất chọn cấu hình **thu thập tối đa 3 khung giờ kết hợp trọng số ưu tiên nhận lớp (*P* = 1.000, *γ* = 0,05)** cho giai đoạn đầu vì mục tiêu sống còn của trung tâm đang tăng trưởng là giữ chân tối đa học viên đăng ký mới (*R*<sub>ghép</sub> = 92,7%) và cam kết phản hồi lịch trong 2 ngày (SLA<sub>16h</sub> = 99,3%). Khi đội ngũ gia sư gần chạm trần công suất vào mùa cao điểm ôn thi, Quản lý có thể nâng *γ* lên vùng 1.065–1.085 (Bảng 6.2) để ưu tiên dồn vào lớp nhóm. Lộ trình triển khai gồm hai bước gọn nhẹ:
+
+1. **Bước 1 — Chuẩn hóa dữ liệu đầu vào (2 tuần đầu, chưa cần tích hợp sâu):** Cập nhật biểu mẫu tư vấn của CSKH để bắt buộc ghi nhận tối thiểu 2–3 khung giờ khả dụng của học viên theo thứ tự ưu tiên, đồng thời lập bảng đăng ký ca trống cố định hằng tuần cho 10 gia sư. Chỉ riêng việc có sẵn hai bảng dữ liệu chuẩn này đã loại bỏ được phần lớn tin nhắn hỏi dò trên Zalo.
+2. **Bước 2 — Tích hợp module gợi ý MILP vào trang Quản lý (từ tuần thứ 3):** Nhúng hàm giải `solve_to_be_milp` (dùng thư viện mã nguồn mở `scipy` sẵn có trong môi trường Python/Django của CatPlus) thành một nút bấm *"Gợi ý xếp lớp đợt này"* trên màn hình của Quản lý học vụ; theo dõi song song với quyết định thực tế của Quản lý trong 1 tháng để tinh chỉnh trọng số.
+
+### 7.3 Vai trò, nguồn lực và chỉ số theo dõi
+
+Trong mô hình mới, phần mềm chuyển từ công cụ ghi chép thụ động sang nguồn lực tác động (operant resource) hỗ trợ tính toán tổ hợp, giải phóng hơn 80% thời gian dò lịch tay cho Quản lý học vụ để tập trung kiểm soát chất lượng chuyên môn. Để duy trì hiệu quả lâu dài, nhóm đề xuất bộ chỉ số theo dõi định kỳ dựa trên bốn góc nhìn của Thẻ điểm cân bằng (Balanced Scorecard, Bảng 7.2).
+
+**Bảng 7.2.** Chỉ số theo dõi đề xuất sau khi áp dụng quy trình ghép lịch mới
+
+| Góc nhìn quản trị | Chỉ số theo dõi | Cách tính và nguồn dữ liệu trên hệ thống | Tần suất |
+| :--- | :--- | :--- | :--- |
+| Người thụ hưởng (Học viên) | *R*<sub>ghép</sub>, SLA<sub>16h</sub> và Fit<sub>ghép</sub> | Tỷ lệ nhập học, % hồ sơ chốt ≤ 16h làm việc và điểm khớp lịch từ DB | Hằng tuần |
+| Quy trình nội bộ | Tỷ lệ phải hỏi đổi lịch lại (Rework) | Phần trăm hồ sơ CSKH phải gọi lại phụ huynh xin đổi giờ sau lần đầu | Hằng tuần |
+| Nguồn lực & Tài chính | Sĩ số trung bình lớp nhóm & ca thiếu người | Sĩ số TB các lớp nhóm mở mới (mục tiêu ≥ 3,8 em/lớp); thống kê ca có *u*<sub>*i*</sub> = 1 | Hằng tháng |
+| Học hỏi & Phát triển | Tỷ lệ khớp giữa gợi ý MILP và duyệt thực tế | Tỷ lệ gợi ý được Quản lý giữ nguyên không phải sửa tay; cập nhật lại trọng số | Hằng quý |
+
+### 7.4 Đánh đổi
+
+Phương án cải tiến đi kèm bốn đánh đổi thực tế cần được trung tâm chấp nhận và quản trị rõ ràng. Thứ nhất, cuộc gọi tư vấn đầu tiên của CSKH sẽ kéo dài thêm khoảng 3–5 phút để khai thác kỹ 2–3 khung giờ rảnh của gia đình, đổi lại CSKH không phải gọi đi gọi lại xin đổi giờ ở các ngày sau. Thứ hai, việc gom hồ sơ chạy theo hai đợt mỗi ngày tạo ra độ trễ chờ gom đợt từ 1 đến 3,5 giờ làm việc, nhưng nhờ cắt bỏ vòng lặp nhắn tin Zalo nên tổng thời gian chờ của học viên vẫn giảm hơn một nửa (từ 22,56 xuống 10,29 giờ). Thứ ba, điểm phù hợp lịch tính riêng trên nhóm vào lớp giảm nhẹ 3,5 điểm (từ 96,8 xuống 93,3 điểm) do một số học viên linh hoạt được xếp sang lựa chọn ưu tiên 2 hoặc 3 nhằm gom đủ nhóm 3–5 người để cứu thêm 32,3% học viên khác. Cuối cùng, hiệu quả của mô hình phụ thuộc vào kỷ luật cập nhật lịch trống hằng tuần của đội ngũ gia sư.
 
 ---
 
-## 7. ĐO LƯỜNG ĐỐI CHỨNG VÀ KẾT LUẬN
+## 8 Kết luận
 
-### 7.1. Bảng tổng hợp kết quả trước và sau cải tiến
+### 8.1 Trả lời câu hỏi phân tích
 
-| Nhóm chỉ số đánh giá | Chỉ số đo lường cụ thể | Cách làm hiện tại (Xếp tay từng ca) | Phương án cải tiến (Hỏi 3 giờ + Máy gợi ý + Quản lý duyệt) | Mức độ cải thiện mang lại cho trung tâm |
-| :--- | :--- | :---: | :---: | :--- |
-| **KPI 1 (Giảng viên gợi ý)** | **Tỷ lệ ghép lớp thành công (%)** | 60,4% (±8,7%) | **92,7%** (±4,4%) | **Tăng thêm 32,3%** (ổn định hơn gấp đôi) |
-| **Chi tiết lượng học viên rớt** | Số học viên bị mất trung bình / tháng | 23,75 học viên *(17,5 do thiếu nhóm/GS, 6,25 do lệch lịch)* | **4,40 học viên** | **Giảm 81,5% số học viên bỏ cuộc** |
-| **KPI 2 (Giảng viên gợi ý)** | **Độ phù hợp lịch — Nhóm đã vào lớp** | 96,8 / 100 điểm | 93,3 / 100 điểm | Giảm nhẹ 3,5 điểm *(để gom các bạn linh hoạt vào chung nhóm)* |
-| **KPI 2 (Tính toàn trung tâm)** | **Độ phù hợp lịch — Toàn bộ khách đăng ký** | 58,5 / 100 điểm | **86,5 / 100 điểm** | **Tăng thêm 28,0 điểm trên thang 100** |
-| **KPI 3 (Giảng viên gợi ý)** | **Thời gian chờ trung bình của học viên** | 22,6 giờ làm việc *(~2,82 ngày)* | **10,3 giờ làm việc** *(~1,29 ngày)* | **Giảm 12,3 giờ làm việc (nhanh hơn 54,4%)** |
-| **KPI 3 (Nhóm chờ lâu nhất)** | **Thời gian chờ mức 90% hồ sơ (P90)** | 31,3 giờ làm việc *(~3,91 ngày)* | **13,2 giờ làm việc** *(~1,66 ngày)* | **Giảm 18,1 giờ làm việc (nhanh hơn 57,7%)** |
-| **Cam kết chất lượng (SLA)** | **Tỷ lệ chốt xong lịch trong vòng 2 ngày (≤ 16h)** | Chỉ đạt 18,0% | **Đạt 99,3%** | **Tăng thêm 81,3% hồ sơ đạt chuẩn đúng hạn** |
-| **Độ thông thoáng quy trình** | **Số hồ sơ bị treo chờ xử lý cùng lúc (WIP)** | 5,64 hồ sơ | **2,57 hồ sơ** | **Giảm 54,4% lượng hồ sơ ứ đọng** |
-| **Hiệu suất nhân sự** | **Tỷ lệ thời gian Quản lý phải dò lịch tay** | Chiếm 49,7% giờ làm | **Chỉ còn 8,7% giờ làm** | **Giải phóng hơn 80% thời gian cho Quản lý học vụ** |
+**Q1. Tỷ lệ ghép lớp thành công và vai trò của số khung giờ thu thập.** Trên cùng đội ngũ 10 gia sư và quy định cứng lớp nhóm 3–5 học viên, phương án TO-BE nâng tỷ lệ ghép thành công từ **60,4% lên 92,7%** (+32,3 điểm phần trăm), giảm số học viên bị rớt mỗi tháng từ 23,75 xuống 4,40 em (−81,5%). Phân tích độ nhạy chứng minh điều kiện tiên quyết là CSKH phải thu thập được tối thiểu **2 đến 3 khung giờ khả dụng** của học sinh (nếu chỉ hỏi 1 khung giờ, MILP chỉ đạt 58,3%).
 
-### 7.2. Góc nhìn Chiến lược dài hạn (Liên hệ Bài L6–L7)
-Khi nhìn rộng ra bài toán quản trị chiến lược của trung tâm đào tạo theo khung **Thẻ điểm cân bằng (Balanced Scorecard)**:
-- **Về phía Khách hàng:** Phụ huynh thấy trung tâm phản hồi chuyên nghiệp, chỉ cần trao đổi 1 lần là có lịch học phù hợp trong vòng hơn 1 ngày làm việc, không bị rơi vào cảnh chờ đợi vô vọng.
-- **Về phía Quy trình nội bộ:** Xóa bỏ được điểm nghẽn lớn nhất là khâu gom nhóm 3–5 người và vòng lặp nhắn tin hỏi lịch qua Zalo.
-- **Về phía Đội ngũ nhân sự:** Quản lý học vụ không còn bị cuốn vào việc dò bảng lịch thủ công, có thời gian để dự giờ, kiểm tra chất lượng bài giảng và chăm sóc các học viên đang học.
-- **Về phía Tài chính & Mở rộng quy mô:** Trên cùng một đội ngũ 10 gia sư, số lượng học viên nhập học thành công tăng thêm gần 19 em mỗi tháng. Hơn nữa, khi trung tâm bước vào mùa cao điểm ôn thi học sinh giỏi, danh sách các hồ sơ chưa ghép được từ phần mềm sẽ chỉ ra chính xác **trung tâm đang thiếu gia sư ở cấp học nào và vào khung giờ nào nhất**, giúp ban giám đốc tuyển thêm đúng người, đúng ca.
+**Q2. Đánh đổi về độ phù hợp lịch học.** Để gom các học sinh rời rạc thành các nhóm đủ từ 3 đến 5 người, mô hình điều phối một phần học viên linh hoạt sang khung giờ ưu tiên 2 hoặc 3, làm điểm phù hợp trên tập vào lớp giảm nhẹ 3,5 điểm (96,8 xuống 93,3 điểm), nhưng nâng điểm phù hợp chung trên toàn bộ học viên đăng ký tăng thêm **+28,0 điểm** (từ 58,5 lên 86,5 điểm) và trội Pareto hoàn toàn so với cách xếp tay.
 
-### 7.3. Giới hạn của báo cáo và bước tiếp theo với dữ liệu thật
-1. **Giới hạn hiện tại:** Bộ con số trong bản báo cáo này đang được chạy thử nghiệm trên dữ liệu mô phỏng (dựa theo đúng quy tắc vận hành thực tế của CatPlus). Một số yếu tố mềm ngoài đời thực như *"phụ huynh chỉ định đích danh gia sư quen"* hoặc *"gia sư xin nghỉ ốm đột xuất"* vẫn cần sự linh hoạt xử lý của Quản lý học vụ.
-2. **Kế hoạch cập nhật dữ liệu thật:** Nhóm đã viết sẵn công cụ trích xuất dữ liệu an toàn [export_real_data_template.py](./export_real_data_template.py) (chỉ lấy mốc thời gian và trạng thái xếp lớp, tự động xóa bỏ hoàn toàn tên tuổi, số điện thoại của học sinh và phụ huynh). Ngay khi dữ liệu thực tế trên máy chủ được cập nhật đầy đủ, nhóm sẽ chạy lại mô hình để đối chiếu trực tiếp với bộ kết quả này.
+**Q3. Thời gian chờ học viên và tải nhân sự.** Mô phỏng hàng đợi gắn kết cho thấy thời gian chờ trung bình giảm **54,4%** (từ 22,56 xuống 10,29 giờ làm việc, tức từ 2,82 xuống 1,29 ngày), phân vị P90 giảm **57,7%** (từ 31,29 xuống 13,24 giờ), nâng tỷ lệ chốt lịch trong 2 ngày làm việc từ **18,0% lên 99,3%**. Số hồ sơ ứ đọng trung bình giảm từ 5,64 xuống 2,57 hồ sơ, đồng thời giải phóng tỷ lệ bận thủ công của Quản lý học vụ từ **49,7% xuống còn 8,7%**.
+
+Từ góc độ khoa học dịch vụ, nghiên cứu cho thấy trung tâm đào tạo có thể tăng mạnh số lớp khai giảng và rút ngắn hơn một nửa thời gian chờ mà chưa cần tuyển thêm gia sư hay thay thế vai trò tư vấn của con người, chỉ bằng cách chuẩn hóa thông tin đầu vào của khách hàng (UST) và bổ sung công cụ tối ưu hóa như một nguồn lực tác động (SDL) hỗ trợ Quản lý ra quyết định.
+
+### 8.2 Giới hạn
+
+- Các con số định lượng hiện tại được tính trên bộ dữ liệu mô phỏng tái lập (`seed = 42`); dù cấu trúc lớp và quy trình bám sát hệ thống CatPlus, phân phối xác suất chọn từng khung giờ trong tuần vẫn là giả định cần được hiệu chỉnh lại bằng dữ liệu lịch sử thật.
+- Mô hình hiện xét từng đợt độc lập với quy định lớp nhóm mở mới phải đủ 3–5 học viên, chưa mô hình hóa chi tiết việc ghép bổ sung học viên mới vào các lớp nhóm cũ đang học dở chương trình.
+- Các yếu tố định tính ngoài khung giờ và cấp học (như phong cách truyền đạt của từng gia sư hay yêu cầu chọn thầy quen của phụ huynh) chưa được đưa vào hàm mục tiêu mà phụ thuộc bước duyệt cuối của Quản lý học vụ.
+
+### 8.3 Hướng phát triển
+
+- Chạy kịch bản trích xuất dữ liệu ẩn danh `export_real_data_template.py` trên máy chủ sản xuất của CatPlus ngay khi hoàn tất nhập liệu để hiệu chỉnh lại phân phối nhu cầu theo giờ và kiểm định đối chứng ngoài mẫu giữa các tháng.
+- Mở rộng mô hình MILP cho phép ghép xen kẽ học viên mới vào các lớp nhóm đang hoạt động có sĩ số 3–4 em và cùng tiến độ chuyên đề.
+- Sử dụng thống kê các ca rơi vào biến lớp ảo (*u*<sub>*i*</sub> = 1) theo từng khung giờ để thiết kế chính sách phụ cấp khuyến khích gia sư mở thêm ca dạy vào các khung giờ cao điểm cuối tuần.
 
 ---
 
-## 8. PHỤ LỤC 1: KHAI BÁO MINH BẠCH VIỆC SỬ DỤNG AI (THEO MỤC 11 RUBRIC)
+## Tài liệu tham khảo
 
-Nhóm tuân thủ nghiêm túc quy định về minh bạch học thuật: công bố rõ những phần có sử dụng công cụ AI hỗ trợ, tự kiểm tra toàn bộ logic nghiệp vụ và tuyệt đối không lấy số liệu mô phỏng để trình bày gian dối thành số liệu thu thập thực tế.
+[1] Steven Alter. Work System Theory: Overview of Core Concepts, Extensions, and Challenges for the Future. *Journal of the Association for Information Systems*, 14(2):72–121, 2013. doi: 10.17705/1jais.00323.
 
-| Thành phần trong báo cáo | Có dùng AI? | Công cụ & Phạm vi AI hỗ trợ | Cách nhóm tự kiểm tra và chịu trách nhiệm |
+[2] Stephen L. Vargo and Robert F. Lusch. Institutions and axioms: an extension and update of service-dominant logic. *Journal of the Academy of Marketing Science*, 44(1):5–23, 2016. doi: 10.1007/s11747-015-0456-3.
+
+[3] Scott E. Sampson and Craig M. Froehle. Foundations and Implications of a Proposed Unified Services Theory. *Production and Operations Management*, 15(2):329–343, 2006. doi: 10.1111/j.1937-5956.2006.tb00248.x.
+
+[4] John D. C. Little. A Proof for the Queuing Formula: *L* = *λW*. *Operations Research*, 9(3):383–387, 1961. doi: 10.1287/opre.9.3.383.
+
+[5] Mark S. Daskin. *Service Science*. John Wiley & Sons, Hoboken, NJ, 2010. doi: 10.1002/9780470877876.
+
+[6] Q. Huangfu and J. A. J. Hall. Parallelizing the dual revised simplex method. *Mathematical Programming Computation*, 10(1):119–142, 2018. (Bộ giải quy hoạch nguyên HiGHS trong `scipy.optimize.milp`).
+
+[7] Team SimPy. SimPy: Discrete event simulation for Python. `https://simpy.readthedocs.io/`, 2026. Truy cập ngày 23/11/2026.
+
+[8] Object Management Group (OMG). Business Process Model and Notation (BPMN), Version 2.0.2. `https://www.omg.org/spec/BPMN/2.0.2/`, 2014.
+
+---
+
+## Phụ lục: Khai báo minh bạch sử dụng AI
+
+Thực hiện quy định tại Mục 11 của Hướng dẫn dự án học phần INT3501, Nhóm 20 công bố chi tiết phạm vi sử dụng công cụ AI hỗ trợ và quy trình tự kiểm chứng của nhóm đối với từng thành phần trong báo cáo tại Bảng A.1. Nhóm phân biệt rõ ràng giữa kiến trúc nghiệp vụ thật của nền tảng CatPlus và bộ số liệu mô phỏng tái lập (`seed = 42`), tuyệt đối không trình bày dữ liệu giả lập như số liệu thu thập thực tế.
+
+**Bảng A.1.** Bảng khai báo sử dụng AI theo từng thành phần và cách nhóm kiểm chứng
+
+| Thành phần | Dùng AI? | Phần AI hỗ trợ và công cụ | Cách nhóm tự kiểm chứng |
 | :--- | :---: | :--- | :--- |
-| **1. Văn bản, lập luận và cách trình bày** | Có | AI hỗ trợ sắp xếp bố cục 8 mục theo hướng dẫn của môn học và biên tập lại câu chữ cho mạch lạc, dễ đọc. | Nhóm tự rà soát lại từng đoạn văn để đảm bảo phản ánh đúng quy trình làm việc thực tế của CSKH, Quản lý và Gia sư tại CatPlus. |
-| **2. Hình ảnh và biểu đồ kết quả** | Không | Không dùng AI vẽ ảnh minh họa giả; toàn bộ 6 biểu đồ/sơ đồ đều được xuất trực tiếp từ mã chạy Python. | Nhóm mở từng file ảnh kiểm tra độ nét, phông chữ tiếng Việt và đối chiếu khớp hoàn toàn với bảng kết quả số liệu. |
-| **3. Sơ đồ quy trình BPMN và Bản đồ nguồn lực** | Có | AI hỗ trợ viết khung mã XML cho 2 file `.bpmn` và mã vẽ sơ đồ Swimlane / Resource Map. | Nhóm đưa cả 2 file `.bpmn` lên công cụ chuẩn https://demo.bpmn.io/new để kiểm tra và tự rà soát theo đúng bảng 10 lỗi BPMN trong bài giảng L3B. |
-| **4. Bảng biểu và số liệu thống kê** | Có | AI hỗ trợ viết đoạn mã tổng hợp kết quả trung bình sau 20 lần chạy mô phỏng sang file JSON. | Nhóm ghi chú minh bạch đây là số liệu mô phỏng tái lập (hạt giống `seed=42`) và tự tính tay kiểm tra lại các tỷ lệ %, Định luật Little. |
-| **5. Công thức và mô hình tính toán** | Có | AI hỗ trợ chuyển quy định lớp 1–1 và lớp nhóm 3–5 học viên của trung tâm thành mô hình tối ưu hóa và mô phỏng hàng đợi SimPy. | Nhóm kiểm tra kỹ 4 quy tắc ràng buộc mở lớp, chạy thử nghiệm độ nhạy để xác nhận kết quả biến thiên hợp lý, đúng logic thực tế. |
-| **6. Mã nguồn thực nghiệm và trích xuất dữ liệu** | Có | AI hỗ trợ viết file mã nguồn `CatPlus_Sim_Opt_Model.py` và công cụ xuất dữ liệu ẩn danh `export_real_data_template.py`. | Nhóm tự chạy kiểm thử toàn bộ mã nguồn trên máy tính cá nhân và đối chiếu khớp với cấu trúc cơ sở dữ liệu thật của dự án CatPlus. |
-
----
-
-## 9. PHỤ LỤC 2: BẢNG TỰ KIỂM TRA CHẤT LƯỢNG THEO THANG ĐIỂM RUBRIC (100 ĐIỂM)
-
-| Thứ tự | Tiêu chí chấm điểm trong Rubric | Yêu cầu cần đạt để lấy điểm tối đa | Phần thể hiện cụ thể trong báo cáo của Nhóm 20 | Điểm tự đánh giá |
-| :-: | :--- | :--- | :--- | :-: |
-| **1** | **Tên đề tài, bài toán và phạm vi** *(10 điểm)* | Tên phản ánh đúng vấn đề và bối cảnh (2đ); nêu rõ vấn đề, ranh giới, các bên liên quan, chỉ số đo (8đ). | Mục 1.1–1.3: Trình bày rõ bài toán xếp lịch thủ công, bảng 8 câu hỏi xác định phạm vi và công thức dễ hiểu cho 3 chỉ số giảng viên gợi ý. | **10 / 10** |
-| **2** | **Khung mô hình hệ thống dịch vụ** *(10 điểm)* | Chọn và áp dụng nhất quán 1 khung làm việc chính; khớp với thực tế. | Mục 2.1–2.3: Áp dụng xuyên suốt **Mô hình Hệ thống làm việc (Work System)** với 9 thành phần và 4 nhóm nguyên nhân lỗi sát thực tế CatPlus. | **10 / 10** |
-| **3** | **Bản đồ nguồn lực & đồng tạo giá trị** *(10 điểm)* | Thể hiện rõ ranh giới, 3–5 loại nguồn lực, ai đóng góp/sử dụng, luồng tương tác, lợi ích/chi phí/rủi ro và chú giải. | Mục 3.1–3.3 & Hình 1 (`fig0_resource_map.png`): Đầy đủ 5 yếu tố bắt buộc, có hộp chú giải ký hiệu rõ ràng. | **10 / 10** |
-| **4** | **Sơ đồ quy trình BPMN AS-IS** *(15 điểm)* | Đầy đủ sự kiện đầu/cuối, phân vai Pool/Lane, đúng luồng tin nhắn, có điểm chờ và nhánh ngoại lệ. | Mục 4.1–4.2, Hình 2 (`fig_bpmn_as_is.png`) & file `catplus_matching_as_is.bpmn`: Đủ 3 Pool, 3 Lane, kiểm tra đạt 10/10 tiêu chuẩn L3B và 3 kịch bản chạy thử. | **15 / 15** |
-| **5** | **Chẩn đoán vấn đề** *(10 điểm)* | Chỉ ra nguyên nhân/điểm nghẽn có căn cứ rõ ràng, không nhận xét cảm tính. | Mục 4.3: Chỉ rõ căn cứ vì sao học viên học nhóm bị rải lẻ không đủ ngưỡng 3 em/lớp và thời gian bị ngốn vào các bước chờ tin nhắn Zalo. | **10 / 10** |
-| **6** | **Phân tích chuyên sâu** *(20 điểm)* | Phương pháp, giả định, mô hình tính toán đúng; phân tích có chiều sâu. | Mục 5.1–5.6: Kết hợp bài toán gom nhóm tối ưu (L5) và mô phỏng hàng đợi (L4), kiểm chứng Định luật Little, phân tích độ nhạy 3 chiều và đường biên Pareto (Hình 3–6). | **20 / 20** |
-| **7** | **Phương án cải tiến TO-BE** *(10 điểm)* | Thay đổi cụ thể, khả thi; chỉ rõ cơ chế tác động và sự đánh đổi. | Mục 6.1–6.3 & Hình 7 (`fig_bpmn_to_be.png`): Giữ vai trò con người tư vấn/duyệt cuối, dùng máy gợi ý gom nhóm; nêu rõ các đánh đổi thực tế. | **10 / 10** |
-| **8** | **Đo lường và đối chứng** *(10 điểm)* | So sánh AS-IS và TO-BE trên cùng bộ chỉ số; diễn giải hợp lý và gắn với chiến lược. | Mục 7.1–7.3: Bảng đối chứng 9 chỉ số định lượng, phân tích Thẻ điểm cân bằng (Balanced Scorecard) và hướng mở rộng. | **10 / 10** |
-| **9** | **Trình bày, nguồn & minh bạch AI** *(5 điểm)* | Văn phong sáng rõ, sơ đồ sắc nét (2đ); nguồn minh bạch (1đ); khai báo AI đầy đủ (2đ). | Mục 8 (Phụ lục 1): Văn phong tự nhiên dễ hiểu, công thức không lỗi phông chữ, bảng khai báo AI chi tiết từng hạng mục. | **5 / 5** |
-| **+** | **Điểm thưởng khuyến khích** *(+0 đến +5 điểm)* | Mô phỏng tái lập được, phân tích độ nhạy nghiêm túc, mã nguồn chạy thực tế. | Mã nguồn `CatPlus_Sim_Opt_Model.py` chạy tái lập 100% cùng bộ công cụ trích xuất dữ liệu thật ẩn danh. | **+5 điểm** |
+| Văn bản, lập luận, tổng quan | Có | AI hỗ trợ rà soát bố cục 8 mục theo mẫu báo cáo học phần và biên tập câu chữ mạch lạc | Nhóm đối chiếu toàn bộ nội dung với quy trình thực tế của CSKH, Quản lý tại CatPlus và tài liệu gốc [1]–[8] |
+| Ảnh và hình minh họa | Không | Không dùng AI sinh ảnh giả lập; cả 6 biểu đồ kết quả đều xuất trực tiếp từ mã chạy Python | Kiểm tra trực quan độ phân giải, phông chữ tiếng Việt và đối chiếu khớp với tệp kết quả JSON |
+| Sơ đồ BPMN, bản đồ nguồn lực | Có | AI hỗ trợ sinh khung XML cho 2 tệp `.bpmn` và mã vẽ Matplotlib cho Hình 2.1, 3.1, 7.1 | Nhóm mở kiểm tra trên `https://demo.bpmn.io/new`, rà soát đủ Pool/Lane, Message Flow, cổng XOR và ngoại lệ |
+| Bảng, biểu đồ, số liệu | Có | AI hỗ trợ viết hàm xuất thống kê trung bình 20 chu kỳ tháng sang `simulation_results.json` | Ghi chú rõ nguồn dữ liệu mô phỏng tái lập; tự tính kiểm tra lại Định luật Little (*L* = 0,25 × *W*) và các hiệu số |
+| Công thức, mô hình, mô phỏng | Có | AI hỗ trợ chuyển quy định lớp 1–1 và lớp nhóm 3–5 học viên sang hệ ràng buộc MILP và SimPy | Kiểm tra từng bất đẳng thức (4.2)–(4.5), xác nhận tính hợp lý của 11 kịch bản độ nhạy và đường biên Pareto |
+| Mã nguồn thực nghiệm | Có | AI hỗ trợ viết `CatPlus_Sim_Opt_Model.py`, `export_real_data_template.py` và mã xuất PDF/DOCX | Nhóm trực tiếp chạy kiểm thử không lỗi toàn bộ tệp `.py` và đối chiếu khớp tên bảng/trường với dự án CatPlus |
