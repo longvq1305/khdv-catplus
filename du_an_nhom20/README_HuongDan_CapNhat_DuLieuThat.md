@@ -24,5 +24,5 @@ Thư mục này chứa trọn bộ sản phẩm **Bản làm trước (Draft 1)*
      ```bash
      uv run --with simpy --with scipy --with matplotlib python CatPlus_Sim_Opt_Model.py
      ```
-3. **Bước 3 — Cập nhật vào báo cáo:**
-   * Trong file `Bao_cao_Du_an_Nhom20_CatPlus_Draft1.md`, tìm các vị trí được đánh dấu `[MÔ PHỎNG / CHỜ DỮ LIỆU THẬT]` để điền các số liệu thực nghiệm vừa đo được và cập nhật mục "Nguồn dữ liệu" trong Phụ lục AI.
+3. **Bước 3 — Cập nhật và xuất lại trọn bộ báo cáo:**
+   * Cập nhật các bảng kết quả tại Mục 3, Mục 5, Mục 6 và ghi chú nguồn dữ liệu tại Mục 1.3 & Phụ lục AI trong [Bao_cao_Du_an_Nhom20_CatPlus_Draft1.md](./Bao_cao_Du_an_Nhom20_CatPlus_Draft1.md), sau đó chạy lệnh `python du_an_nhom20/build_preview_docs.py` để đồng bộ lại Mục lục và xuất mới các tệp `.html`, `.pdf`, `.docx`.

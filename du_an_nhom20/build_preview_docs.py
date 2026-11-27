@@ -600,7 +600,7 @@ body {{
       <table class="author-table">
         <tr><td colspan="2">Sinh viên thực hiện:</td></tr>
         <tr><td>23021941</td><td>Phoutthavong Xayavong</td></tr>
-        <tr><td>[Điền MSV]</td><td>Vũ Quốc Long</td></tr>
+        <tr><td>23020105</td><td>Vũ Quốc Long</td></tr>
       </table>
     </div>
 
@@ -621,12 +621,21 @@ body {{
 
 </body>
 </html>"""
-    with open(HTML_PATH, "w", encoding="utf-8") as f:
-        f.write(html_str)
+    import time
+    for attempt in range(5):
+        try:
+            with open(HTML_PATH, "w", encoding="utf-8") as f:
+                f.write(html_str)
+            break
+        except OSError:
+            time.sleep(0.5)
+    else:
+        with open(HTML_PATH, "w", encoding="utf-8") as f:
+            f.write(html_str)
     return headings
 
 
-def render_pdf_via_chrome():
+def render_pdf_via_chrome(pass_id=1):
     chrome_candidates = [
         r"C:\Program Files\Google\Chrome\Application\chrome.exe",
         r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
@@ -636,8 +645,11 @@ def render_pdf_via_chrome():
     if not browser:
         raise RuntimeError("No Chrome/Edge found for PDF export.")
 
-    file_url = "file:///" + HTML_PATH.replace("\\", "/")
-    raw_pdf = os.path.join(OUT_DIR, "_raw_temp.pdf")
+    import shutil
+    temp_html = os.path.join(OUT_DIR, f"_temp_pass{pass_id}.html")
+    shutil.copyfile(HTML_PATH, temp_html)
+    file_url = "file:///" + temp_html.replace("\\", "/")
+    raw_pdf = os.path.join(OUT_DIR, f"_raw_temp_{pass_id}.pdf")
     if os.path.exists(raw_pdf):
         os.remove(raw_pdf)
 
@@ -649,7 +661,17 @@ def render_pdf_via_chrome():
         f"--print-to-pdf={raw_pdf}",
         file_url,
     ]
-    subprocess.run(cmd, check=True, timeout=45)
+    try:
+        subprocess.run(cmd, check=True, timeout=45)
+    finally:
+        import time
+        for _ in range(5):
+            try:
+                if os.path.exists(temp_html):
+                    os.remove(temp_html)
+                break
+            except OSError:
+                time.sleep(0.3)
     return raw_pdf
 
 
@@ -903,7 +925,7 @@ def build_docx(md_text, headings, page_map):
     rg.bold = True
     rg.font.name = "Times New Roman"
     rg.font.size = Pt(12.5)
-    ra = p_aut.add_run("Sinh viên thực hiện:\n23021941    Phoutthavong Xayavong\n[Điền MSV]  Vũ Quốc Long")
+    ra = p_aut.add_run("Sinh viên thực hiện:\n23021941    Phoutthavong Xayavong\n23020105    Vũ Quốc Long")
     ra.font.name = "Times New Roman"
     ra.font.size = Pt(12.5)
 
@@ -1170,13 +1192,15 @@ def main():
 
     # Pass 1: Build HTML with placeholder TOC pages & export raw PDF
     headings = build_html_doc(md_text, page_map=None)
-    raw_pdf_1 = render_pdf_via_chrome()
+    raw_pdf_1 = render_pdf_via_chrome(pass_id=1)
     page_map, first_body_idx = discover_page_numbers_and_stamp(raw_pdf_1, headings)
+    if os.path.exists(raw_pdf_1):
+        os.remove(raw_pdf_1)
     print("Discovered exact section page numbers:", page_map)
 
     # Pass 2: Rebuild HTML with exact TOC page numbers, re-export PDF, and stamp Roman 'i' + '1..N'
     build_html_doc(md_text, page_map=page_map)
-    raw_pdf_2 = render_pdf_via_chrome()
+    raw_pdf_2 = render_pdf_via_chrome(pass_id=2)
     _, first_body_idx_2 = discover_page_numbers_and_stamp(raw_pdf_2, headings)
     total_pages = stamp_page_numbers(raw_pdf_2, first_body_idx_2, PDF_PATH)
     if os.path.exists(raw_pdf_2):
